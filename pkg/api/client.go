@@ -410,3 +410,254 @@ func (c *RTMSClient) GetNotificationPerimeter(id string) ([]byte, error) {
 func (c *RTMSClient) UpdateNotificationPerimeter(id string, perimeterData map[string]interface{}) ([]byte, error) {
 	return c.doRequest("PATCH", fmt.Sprintf("/monitoringServices/notifications/perimeters/%s", id), nil, perimeterData)
 }
+
+func (c *RTMSClient) GetNotificationStaffs(cloudTempleID string, params map[string]string) ([]byte, error) {
+	query := url.Values{}
+	query.Set("cloudTempleId", cloudTempleID)
+	for k, v := range params {
+		query.Set(k, v)
+	}
+	return c.doRequest("GET", "/monitoringServices/notifications/staffs", query, nil)
+}
+
+func (c *RTMSClient) GetNotificationStaff(id string) ([]byte, error) {
+	return c.doRequest("GET", fmt.Sprintf("/monitoringServices/notifications/staffs/%s", id), nil, nil)
+}
+
+func (c *RTMSClient) GetNotificationTimePeriods(cloudTempleID string, params map[string]string) ([]byte, error) {
+	query := url.Values{}
+	query.Set("cloudTempleId", cloudTempleID)
+	for k, v := range params {
+		query.Set(k, v)
+	}
+	return c.doRequest("GET", "/monitoringServices/notifications/timePeriods", query, nil)
+}
+
+func (c *RTMSClient) GetNotificationTimePeriodStops(cloudTempleID string, params map[string]string) ([]byte, error) {
+	query := url.Values{}
+	query.Set("cloudTempleId", cloudTempleID)
+	for k, v := range params {
+		query.Set(k, v)
+	}
+	return c.doRequest("GET", "/monitoringServices/notifications/timePeriodStops", query, nil)
+}
+
+func (c *RTMSClient) CreateNotificationTimePeriodStop(cloudTempleID string, stopData map[string]interface{}) ([]byte, error) {
+	query := url.Values{}
+	query.Set("cloudTempleId", cloudTempleID)
+	return c.doRequest("POST", "/monitoringServices/notifications/timePeriodStops", query, stopData)
+}
+
+func (c *RTMSClient) GetNotificationTimePeriodStop(id string) ([]byte, error) {
+	return c.doRequest("GET", fmt.Sprintf("/monitoringServices/notifications/timePeriodStops/%s", id), nil, nil)
+}
+
+func (c *RTMSClient) RemoveNotificationTimePeriodStop(id string) ([]byte, error) {
+	return c.doRequest("DELETE", fmt.Sprintf("/monitoringServices/notifications/timePeriodStops/%s", id), nil, nil)
+}
+
+func (c *RTMSClient) GetNotificationTriggers(cloudTempleID string, params map[string]string) ([]byte, error) {
+	query := url.Values{}
+	query.Set("cloudTempleId", cloudTempleID)
+	for k, v := range params {
+		query.Set(k, v)
+	}
+	return c.doRequest("GET", "/monitoringServices/notifications/triggers", query, nil)
+}
+
+func (c *RTMSClient) GetNotificationTriggerDetails(id string) ([]byte, error) {
+	return c.doRequest("GET", fmt.Sprintf("/monitoringServices/notifications/triggers/%s", id), nil, nil)
+}
+
+func (c *RTMSClient) GetMetricHistory(id string, params map[string]string) ([]byte, error) {
+	query := url.Values{}
+	for k, v := range params {
+		query.Set(k, v)
+	}
+	return c.doRequest("GET", fmt.Sprintf("/monitoringServices/%s/metricHistory", id), query, nil)
+}
+
+func (c *RTMSClient) GetGraphConfigurations(id string, params map[string]string) ([]byte, error) {
+	query := url.Values{}
+	for k, v := range params {
+		query.Set(k, v)
+	}
+	return c.doRequest("GET", fmt.Sprintf("/monitoringServices/%s/graphs", id), query, nil)
+}
+
+func (c *RTMSClient) GetNagiosCommands(params map[string]string) ([]byte, error) {
+	query := url.Values{}
+	for k, v := range params {
+		query.Set(k, v)
+	}
+	return c.doRequest("GET", "/nagiosCommands", query, nil)
+}
+
+func (c *RTMSClient) GetNagiosCommandsTimePeriods(cloudTempleID string, params map[string]string) ([]byte, error) {
+	query := url.Values{}
+	if cloudTempleID != "" {
+		query.Set("cloudTempleId", cloudTempleID)
+	}
+	for k, v := range params {
+		query.Set(k, v)
+	}
+	return c.doRequest("GET", "/nagiosCommands/timePeriods", query, nil)
+}
+
+func (c *RTMSClient) ValidateNagiosPluginPackage(packageData map[string]interface{}) ([]byte, error) {
+	return c.doRequest("POST", "/nagiosPlugins/validatePackage", nil, packageData)
+}
+
+func (c *RTMSClient) UpdateNagiosCommands() ([]byte, error) {
+	return c.doRequest("GET", "/nagiosPlugins/updateNagiosCommands", nil, nil)
+}
+
+func (c *RTMSClient) GetTeams(cloudTempleID string, params map[string]string) ([]byte, error) {
+	query := url.Values{}
+	query.Set("cloudTempleId", cloudTempleID)
+	for k, v := range params {
+		query.Set(k, v)
+	}
+	return c.doRequest("GET", "/teams", query, nil)
+}
+
+func (c *RTMSClient) CreateTeam(cloudTempleID string, teamData map[string]interface{}) ([]byte, error) {
+	query := url.Values{}
+	query.Set("cloudTempleId", cloudTempleID)
+	return c.doRequest("POST", "/teams", query, teamData)
+}
+
+func (c *RTMSClient) GetDefaultTeams(params map[string]string) ([]byte, error) {
+	query := url.Values{}
+	for k, v := range params {
+		query.Set(k, v)
+	}
+	return c.doRequest("GET", "/teams/defaults", query, nil)
+}
+
+func (c *RTMSClient) GetTeamDetails(id string) ([]byte, error) {
+	return c.doRequest("GET", fmt.Sprintf("/teams/%s", id), nil, nil)
+}
+
+func (c *RTMSClient) RemoveTeam(id string) ([]byte, error) {
+	return c.doRequest("DELETE", fmt.Sprintf("/teams/%s", id), nil, nil)
+}
+
+func (c *RTMSClient) EditTeam(id string, teamData map[string]interface{}) ([]byte, error) {
+	return c.doRequest("PATCH", fmt.Sprintf("/teams/%s", id), nil, teamData)
+}
+
+func (c *RTMSClient) GetTenants(params map[string]string) ([]byte, error) {
+	query := url.Values{}
+	for k, v := range params {
+		query.Set(k, v)
+	}
+	return c.doRequest("GET", "/tenants", query, nil)
+}
+
+func (c *RTMSClient) CreateTenant(tenantData map[string]interface{}) ([]byte, error) {
+	return c.doRequest("POST", "/tenants", nil, tenantData)
+}
+
+func (c *RTMSClient) GetTenantDetails(id string) ([]byte, error) {
+	return c.doRequest("GET", fmt.Sprintf("/tenants/%s", id), nil, nil)
+}
+
+func (c *RTMSClient) GetTenantContacts(id string) ([]byte, error) {
+	return c.doRequest("GET", fmt.Sprintf("/tenants/%s/contacts", id), nil, nil)
+}
+
+func (c *RTMSClient) RequestTenantDeletion(id string, delete bool) ([]byte, error) {
+	data := map[string]interface{}{
+		"delete": delete,
+	}
+	return c.doRequest("PATCH", fmt.Sprintf("/tenants/%s/deletionRequest", id), nil, data)
+}
+
+func (c *RTMSClient) GetTenantSSHKeys(id string) ([]byte, error) {
+	return c.doRequest("GET", fmt.Sprintf("/tenants/%s/sshKeys", id), nil, nil)
+}
+
+func (c *RTMSClient) GenerateTenantSSHKey(id string, keyData map[string]interface{}) ([]byte, error) {
+	return c.doRequest("POST", fmt.Sprintf("/tenants/%s/sshKeys", id), nil, keyData)
+}
+
+func (c *RTMSClient) DeleteTenantSSHKey(id string) ([]byte, error) {
+	return c.doRequest("DELETE", fmt.Sprintf("/tenants/sshKeys/%s", id), nil, nil)
+}
+
+func (c *RTMSClient) UpdateTenantSSHKey(id string, keyData map[string]interface{}) ([]byte, error) {
+	return c.doRequest("PATCH", fmt.Sprintf("/tenants/sshKeys/%s", id), nil, keyData)
+}
+
+func (c *RTMSClient) GetTenantWorkflowEmails(id string) ([]byte, error) {
+	return c.doRequest("GET", fmt.Sprintf("/tenants/%s/workflowEmails", id), nil, nil)
+}
+
+func (c *RTMSClient) EditTenantWorkflowEmailsGeneralities(id string, data map[string]interface{}) ([]byte, error) {
+	return c.doRequest("PATCH", fmt.Sprintf("/tenants/%s/workflowEmails/generalities", id), nil, data)
+}
+
+func (c *RTMSClient) EditTenantWorkflowEmailsCreateTicket(id string, data map[string]interface{}) ([]byte, error) {
+	return c.doRequest("PATCH", fmt.Sprintf("/tenants/%s/workflowEmails/createTicket", id), nil, data)
+}
+
+func (c *RTMSClient) EditTenantWorkflowEmailsUpdateTicket(id string, data map[string]interface{}) ([]byte, error) {
+	return c.doRequest("PATCH", fmt.Sprintf("/tenants/%s/workflowEmails/updateTicket", id), nil, data)
+}
+
+func (c *RTMSClient) EditTenantWorkflowEmailsValidationClientTicket(id string, data map[string]interface{}) ([]byte, error) {
+	return c.doRequest("PATCH", fmt.Sprintf("/tenants/%s/workflowEmails/validationClientTicket", id), nil, data)
+}
+
+func (c *RTMSClient) EditTenantWorkflowEmailsCloseTicket(id string, data map[string]interface{}) ([]byte, error) {
+	return c.doRequest("PATCH", fmt.Sprintf("/tenants/%s/workflowEmails/closeTicket", id), nil, data)
+}
+
+func (c *RTMSClient) GetTickets(cloudTempleID string, params map[string]string) ([]byte, error) {
+	query := url.Values{}
+	if cloudTempleID != "" {
+		query.Set("cloudTempleId", cloudTempleID)
+	}
+	for k, v := range params {
+		query.Set(k, v)
+	}
+	return c.doRequest("GET", "/tickets", query, nil)
+}
+
+func (c *RTMSClient) CreateTicket(cloudTempleID string, ticketData map[string]interface{}) ([]byte, error) {
+	query := url.Values{}
+	query.Set("cloudTempleId", cloudTempleID)
+	return c.doRequest("POST", "/tickets", query, ticketData)
+}
+
+func (c *RTMSClient) GetTicketsCount(cloudTempleID string, status int) ([]byte, error) {
+	query := url.Values{}
+	query.Set("cloudTempleId", cloudTempleID)
+	if status >= 0 {
+		query.Set("status", fmt.Sprintf("%d", status))
+	}
+	return c.doRequest("GET", "/tickets/count", query, nil)
+}
+
+func (c *RTMSClient) GetTicketDetails(id string) ([]byte, error) {
+	return c.doRequest("GET", fmt.Sprintf("/tickets/%s", id), nil, nil)
+}
+
+func (c *RTMSClient) EditTicket(id string, ticketData map[string]interface{}) ([]byte, error) {
+	return c.doRequest("PATCH", fmt.Sprintf("/tickets/%s", id), nil, ticketData)
+}
+
+func (c *RTMSClient) GetTicketCatalogs(id string, params map[string]string) ([]byte, error) {
+	query := url.Values{}
+	for k, v := range params {
+		query.Set(k, v)
+	}
+	return c.doRequest("GET", fmt.Sprintf("/tickets/%s/catalogs", id), query, nil)
+}
+
+func (c *RTMSClient) GetTicketsStats(cloudTempleID string) ([]byte, error) {
+	query := url.Values{}
+	query.Set("cloudTempleId", cloudTempleID)
+	return c.doRequest("GET", "/tickets/stats", query, nil)
+}
