@@ -1,4 +1,4 @@
-module github.com/yourusername/rtmscli
+module github.com/chrlesur/rtmscli
 
 go 1.16
 

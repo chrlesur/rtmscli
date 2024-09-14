@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/yourusername/rtmscli/cmd"
+	"github.com/chrlesur/rtmscli/cmd"
 )
 
 func main() {

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/chrlesur/rtmscli/pkg/api"
 	"github.com/spf13/cobra"
-	"github.com/yourusername/rtmscli/pkg/api"
 )
 
 const (
