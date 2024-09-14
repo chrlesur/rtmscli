@@ -2,6 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
+	"strconv"
 
 	"github.com/spf13/cobra"
 )
@@ -93,6 +96,168 @@ func init() {
 		RunE:  getTicketsStats,
 	}
 	ticketsCmd.AddCommand(getTicketsStatsCmd)
+
+	// Attachments subcommand
+	attachmentsCmd := &cobra.Command{
+		Use:   "attachments",
+		Short: "Manage ticket attachments",
+	}
+	ticketsCmd.AddCommand(attachmentsCmd)
+
+	// List attachments
+	listAttachmentsCmd := &cobra.Command{
+		Use:   "list [ticket-id]",
+		Short: "List ticket attachments",
+		Args:  cobra.ExactArgs(1),
+		RunE:  listTicketAttachments,
+	}
+	attachmentsCmd.AddCommand(listAttachmentsCmd)
+
+	// Upload attachment
+	uploadAttachmentCmd := &cobra.Command{
+		Use:   "upload [ticket-id] [file-path]",
+		Short: "Upload a ticket attachment",
+		Args:  cobra.ExactArgs(2),
+		RunE:  uploadTicketAttachment,
+	}
+	attachmentsCmd.AddCommand(uploadAttachmentCmd)
+
+	// Download attachment
+	downloadAttachmentCmd := &cobra.Command{
+		Use:   "download [attachment-id] [output-path]",
+		Short: "Download a ticket attachment",
+		Args:  cobra.ExactArgs(2),
+		RunE:  downloadTicketAttachment,
+	}
+	attachmentsCmd.AddCommand(downloadAttachmentCmd)
+
+	// Remove attachment
+	removeAttachmentCmd := &cobra.Command{
+		Use:   "remove [attachment-id]",
+		Short: "Remove a ticket attachment",
+		Args:  cobra.ExactArgs(1),
+		RunE:  removeTicketAttachment,
+	}
+	attachmentsCmd.AddCommand(removeAttachmentCmd)
+
+	// Comments subcommand
+	commentsCmd := &cobra.Command{
+		Use:   "comments",
+		Short: "Manage ticket comments",
+	}
+	ticketsCmd.AddCommand(commentsCmd)
+
+	// List all comments
+	listAllCommentsCmd := &cobra.Command{
+		Use:   "list-all",
+		Short: "Get all Ticket comments",
+		RunE:  listAllTicketComments,
+	}
+	listAllCommentsCmd.Flags().Int("ticket", 0, "Filter by ticket ID")
+	listAllCommentsCmd.Flags().Int("user", 0, "Filter by user ID")
+	commentsCmd.AddCommand(listAllCommentsCmd)
+
+	// List comments for a specific ticket
+	listTicketCommentsCmd := &cobra.Command{
+		Use:   "list [ticket-id]",
+		Short: "Get Ticket comments by ticket",
+		Args:  cobra.ExactArgs(1),
+		RunE:  listTicketComments,
+	}
+	commentsCmd.AddCommand(listTicketCommentsCmd)
+
+	// Post comment
+	postCommentCmd := &cobra.Command{
+		Use:   "post [ticket-id]",
+		Short: "Post Ticket comment",
+		Args:  cobra.ExactArgs(1),
+		RunE:  postTicketComment,
+	}
+	postCommentCmd.Flags().String("content", "", "Comment content")
+	postCommentCmd.Flags().Bool("private", false, "Comment privacy")
+	postCommentCmd.Flags().Int("duration", 0, "Working time on the Ticket")
+	postCommentCmd.MarkFlagRequired("content")
+	commentsCmd.AddCommand(postCommentCmd)
+
+	// Edit comment
+	editCommentCmd := &cobra.Command{
+		Use:   "edit [comment-id]",
+		Short: "Edit Ticket comment",
+		Args:  cobra.ExactArgs(1),
+		RunE:  editTicketComment,
+	}
+	editCommentCmd.Flags().String("content", "", "Comment content")
+	editCommentCmd.Flags().Bool("private", false, "Comment privacy")
+	editCommentCmd.Flags().Int("duration", 0, "Working time on the Ticket")
+	commentsCmd.AddCommand(editCommentCmd)
+
+	// Tags subcommand
+	tagsCmd := &cobra.Command{
+		Use:   "tags",
+		Short: "Manage ticket tags",
+	}
+	ticketsCmd.AddCommand(tagsCmd)
+
+	// List tags
+	listTagsCmd := &cobra.Command{
+		Use:   "list",
+		Short: "Get a list of ticket tags",
+		RunE:  listTicketTags,
+	}
+	listTagsCmd.Flags().String("label", "", "Filter by label")
+	tagsCmd.AddCommand(listTagsCmd)
+
+	// Create tag
+	createTagCmd := &cobra.Command{
+		Use:   "create",
+		Short: "Create a ticket tag",
+		RunE:  createTicketTag,
+	}
+	createTagCmd.Flags().String("label", "", "Tag label")
+	createTagCmd.Flags().String("description", "", "Tag description")
+	createTagCmd.Flags().IntSlice("tickets", nil, "List of ticket IDs to associate with the tag")
+	createTagCmd.MarkFlagRequired("label")
+	tagsCmd.AddCommand(createTagCmd)
+
+	// Get tag details
+	getTagDetailsCmd := &cobra.Command{
+		Use:   "details [id]",
+		Short: "Get details of a tag",
+		Args:  cobra.ExactArgs(1),
+		RunE:  getTicketTagDetails,
+	}
+	tagsCmd.AddCommand(getTagDetailsCmd)
+
+	// Remove tag
+	removeTagCmd := &cobra.Command{
+		Use:   "remove [id]",
+		Short: "Remove a ticket tag",
+		Args:  cobra.ExactArgs(1),
+		RunE:  removeTicketTag,
+	}
+	tagsCmd.AddCommand(removeTagCmd)
+
+	// Edit tag
+	editTagCmd := &cobra.Command{
+		Use:   "edit [id]",
+		Short: "Edit ticket tag",
+		Args:  cobra.ExactArgs(1),
+		RunE:  editTicketTag,
+	}
+	editTagCmd.Flags().String("label", "", "Tag label")
+	editTagCmd.Flags().String("description", "", "Tag description")
+	editTagCmd.Flags().IntSlice("tickets", nil, "List of ticket IDs to associate with the tag")
+	tagsCmd.AddCommand(editTagCmd)
+
+	// Get tickets by tag
+	getTicketsByTagCmd := &cobra.Command{
+		Use:   "tickets [id]",
+		Short: "Gets tickets that match a given tag",
+		Args:  cobra.ExactArgs(1),
+		RunE:  getTicketsByTag,
+	}
+	tagsCmd.AddCommand(getTicketsByTagCmd)
+
 }
 
 func getTickets(cmd *cobra.Command, args []string) error {
@@ -229,6 +394,225 @@ func getTicketCatalogs(cmd *cobra.Command, args []string) error {
 
 func getTicketsStats(cmd *cobra.Command, args []string) error {
 	response, err := client.GetTicketsStats(cloudTempleID)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(response))
+	return nil
+}
+
+func listTicketAttachments(cmd *cobra.Command, args []string) error {
+	response, err := client.ListTicketAttachments(args[0])
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(response))
+	return nil
+}
+
+func uploadTicketAttachment(cmd *cobra.Command, args []string) error {
+	ticketID := args[0]
+	filePath := args[1]
+
+	content, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return fmt.Errorf("failed to read file: %v", err)
+	}
+
+	filename := filepath.Base(filePath)
+	response, err := client.UploadTicketAttachment(ticketID, filename, content)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(response))
+	return nil
+}
+
+func downloadTicketAttachment(cmd *cobra.Command, args []string) error {
+	attachmentID := args[0]
+	outputPath := args[1]
+
+	response, err := client.DownloadTicketAttachment(attachmentID)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(outputPath, response, 0644)
+	if err != nil {
+		return fmt.Errorf("failed to write file: %v", err)
+	}
+
+	fmt.Printf("Attachment downloaded successfully to %s\n", outputPath)
+	return nil
+}
+
+func removeTicketAttachment(cmd *cobra.Command, args []string) error {
+	response, err := client.RemoveTicketAttachment(args[0])
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(response))
+	return nil
+}
+
+func listAllTicketComments(cmd *cobra.Command, args []string) error {
+	ticketID, _ := cmd.Flags().GetInt("ticket")
+	userID, _ := cmd.Flags().GetInt("user")
+
+	params := make(map[string]string)
+	if ticketID != 0 {
+		params["ticket"] = strconv.Itoa(ticketID)
+	}
+	if userID != 0 {
+		params["user"] = strconv.Itoa(userID)
+	}
+
+	response, err := client.GetTicketComments(cloudTempleID, params)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(response))
+	return nil
+}
+
+func listTicketComments(cmd *cobra.Command, args []string) error {
+	ticketID := args[0]
+	response, err := client.GetTicketCommentsByTicket(ticketID, nil)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(response))
+	return nil
+}
+
+func postTicketComment(cmd *cobra.Command, args []string) error {
+	ticketID := args[0]
+	content, _ := cmd.Flags().GetString("content")
+	private, _ := cmd.Flags().GetBool("private")
+	duration, _ := cmd.Flags().GetInt("duration")
+
+	commentData := map[string]interface{}{
+		"content": content,
+		"private": private,
+	}
+	if duration != 0 {
+		commentData["duration"] = duration
+	}
+
+	response, err := client.PostTicketComment(ticketID, commentData)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(response))
+	return nil
+}
+
+func editTicketComment(cmd *cobra.Command, args []string) error {
+	commentID := args[0]
+	content, _ := cmd.Flags().GetString("content")
+	private, _ := cmd.Flags().GetBool("private")
+	duration, _ := cmd.Flags().GetInt("duration")
+
+	commentData := make(map[string]interface{})
+	if content != "" {
+		commentData["content"] = content
+	}
+	if cmd.Flags().Changed("private") {
+		commentData["private"] = private
+	}
+	if duration != 0 {
+		commentData["duration"] = duration
+	}
+
+	response, err := client.EditTicketComment(commentID, commentData)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(response))
+	return nil
+}
+
+func listTicketTags(cmd *cobra.Command, args []string) error {
+	label, _ := cmd.Flags().GetString("label")
+	params := make(map[string]string)
+	if label != "" {
+		params["label"] = label
+	}
+	response, err := client.GetTicketTags(cloudTempleID, params)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(response))
+	return nil
+}
+
+func createTicketTag(cmd *cobra.Command, args []string) error {
+	label, _ := cmd.Flags().GetString("label")
+	description, _ := cmd.Flags().GetString("description")
+	tickets, _ := cmd.Flags().GetIntSlice("tickets")
+
+	tagData := map[string]interface{}{
+		"label": label,
+	}
+	if description != "" {
+		tagData["description"] = description
+	}
+	if len(tickets) > 0 {
+		tagData["tickets"] = tickets
+	}
+
+	response, err := client.CreateTicketTag(cloudTempleID, tagData)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(response))
+	return nil
+}
+
+func getTicketTagDetails(cmd *cobra.Command, args []string) error {
+	response, err := client.GetTicketTagDetails(args[0])
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(response))
+	return nil
+}
+
+func removeTicketTag(cmd *cobra.Command, args []string) error {
+	response, err := client.RemoveTicketTag(args[0])
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(response))
+	return nil
+}
+
+func editTicketTag(cmd *cobra.Command, args []string) error {
+	label, _ := cmd.Flags().GetString("label")
+	description, _ := cmd.Flags().GetString("description")
+	tickets, _ := cmd.Flags().GetIntSlice("tickets")
+
+	tagData := make(map[string]interface{})
+	if label != "" {
+		tagData["label"] = label
+	}
+	if description != "" {
+		tagData["description"] = description
+	}
+	if len(tickets) > 0 {
+		tagData["tickets"] = tickets
+	}
+
+	response, err := client.EditTicketTag(args[0], tagData)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(response))
+	return nil
+}
+
+func getTicketsByTag(cmd *cobra.Command, args []string) error {
+	response, err := client.GetTicketsByTag(args[0], nil)
 	if err != nil {
 		return err
 	}
