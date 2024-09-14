@@ -4,12 +4,11 @@ The RTMS CLI provides several commands for managing appliances. This document ou
 
 ## Available Commands
 
-- `rtmscli appliances list`: List all appliances
-- `rtmscli appliances details`: Get details of a specific appliance
-- `rtmscli appliances services`: Get services of a specific appliance
-- `rtmscli appliances synchronize`: Synchronize an appliance
-- `rtmscli appliances configuration`: Get appliance configuration
-- `rtmscli appliances healthcheck`: Get or post appliance health check
+- `rtmscli get-appliances`: List all appliances
+- `rtmscli get-appliance-details`: Get details of a specific appliance
+- `rtmscli get-appliance-services`: Get services of a specific appliance
+- `rtmscli synchronize-appliance`: Synchronize an appliance
+- `rtmscli get-appliance-healthcheck`: Get or post appliance health check
 
 ## Usage Examples
 
@@ -18,29 +17,24 @@ The RTMS CLI provides several commands for managing appliances. This document ou
 To list all appliances:
 
 ```
-rtmscli appliances list
+rtmscli get-appliances
 ```
 
 Options:
-- `--name`: Filter appliances by name
-- `--cloud-temple-id`: Specify the Cloud Temple ID (required)
+- `--cloud-temple-id`: Specify the Cloud Temple ID (**required**)
 
-Example:
-```
-rtmscli appliances list --cloud-temple-id=your_id --name=app1
-```
 
 ### Get Appliance Details
 
 To get details of a specific appliance:
 
 ```
-rtmscli appliances details [appliance-id]
+rtmscli get-appliance-details [appliance-id]
 ```
 
 Example:
 ```
-rtmscli appliances details 12345
+rtmscli get-appliance-details 12345
 ```
 
 ### Get Appliance Services
@@ -48,12 +42,12 @@ rtmscli appliances details 12345
 To get services of a specific appliance:
 
 ```
-rtmscli appliances services [appliance-id]
+rtmscli  get-appliance-services [appliance-id]
 ```
 
 Example:
 ```
-rtmscli appliances services 12345
+rtmscli  get-appliance-services 12345
 ```
 
 ### Synchronize Appliance
@@ -61,12 +55,12 @@ rtmscli appliances services 12345
 To synchronize an appliance:
 
 ```
-rtmscli appliances synchronize [appliance-id]
+rtmscli synchronize-appliance [appliance-id]
 ```
 
 Example:
 ```
-rtmscli appliances synchronize 12345
+rtmscli synchronize-appliance 12345
 ```
 
 ### Get Appliance Configuration
@@ -87,18 +81,7 @@ rtmscli appliances configuration 12345 --appliance-version=1.0.0 --plugins-path=
 To get the last health check of an appliance:
 
 ```
-rtmscli appliances healthcheck get [appliance-id]
-```
-
-To post a health check for an appliance:
-
-```
-rtmscli appliances healthcheck post [appliance-id] --appliance-version=[version] --nagios-operating-state=[state] --details=[details]
-```
-
-Example:
-```
-rtmscli appliances healthcheck post 12345 --appliance-version=1.0.0 --nagios-operating-state=OK --details="Everything is running smoothly"
+rtmscli get-appliance-healthcheck [appliance-id]
 ```
 
 ## Common Options
@@ -110,13 +93,7 @@ All appliance commands support the following options:
 
 Example using format option:
 ```
-rtmscli -f markdown appliances list --cloud-temple-id=your_id
+rtmscli -f markdown get-appliances --cloud-temple-id=your_id
 ```
 
 For more detailed information on each command and its options, use the `--help` flag:
-
-```
-rtmscli appliances --help
-rtmscli appliances [command] --help
-```
-
