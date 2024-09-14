@@ -1,5 +1,4 @@
 # RTMS CLI
-
 RTMS CLI is a command-line interface for interacting with the RTMS (Real-Time Monitoring System) API. It allows you to easily manage appliances, hosts, tickets, and more directly from your terminal.
 
 **This project is in beta version: be very vigilant when using it and report any bugs you encounter for correction**
