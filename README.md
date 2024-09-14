@@ -2,6 +2,8 @@
 
 RTMS CLI is a command-line interface for interacting with the RTMS (Real-Time Monitoring System) API. It allows you to easily manage appliances, hosts, tickets, and more directly from your terminal.
 
+**This project is in beta version: be very vigilant when using it and report any bugs you encounter for correction**
+
 ## Version
 
 - 20240914 - 1.00 Beta Release 
@@ -81,7 +83,7 @@ Once Go is installed, you can install RTMS CLI by following these steps:
 
 3. Compile and install the CLI:
    ```
-   go install
+   go build
    ```
 
 ## Configuration
@@ -98,6 +100,15 @@ setx RTMS_API_KEY "your_api_key_here"
 echo 'export RTMS_API_KEY="your_api_key_here"' >> ~/.bashrc
 source ~/.bashrc
 ```
+## Important Note
+
+The Cloud Temple ID (`-c` or `--cloud-temple-id`) is a required parameter for most commands. Make sure to include it in your commands, like this:
+
+```
+rtmscli [command] -c cloud_temple_id [other options]
+```
+
+This ID is specific to your Cloud Temple environment and is necessary for the CLI to interact with the correct resources in the RTMS API.
 
 ## Basic Usage
 
@@ -108,13 +119,13 @@ Here are some basic usage examples of RTMS CLI:
 rtmscli version
 
 # List appliances
-rtmscli appliances list
+rtmscli -c cloud_temple_id get-appliances list
 
 # Create a ticket
-rtmscli tickets create --name="New ticket" --description="Ticket description"
+rtmscli -c cloud_temple_id tickets create --name="New ticket" --description="Ticket description"
 
 # List users with HTML output format
-rtmscli -f html users list
+rtmscli -c cloud_temple_id -f html users list
 ```
 
 For more information on available commands, use:
