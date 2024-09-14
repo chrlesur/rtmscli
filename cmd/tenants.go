@@ -212,7 +212,14 @@ func getTenants(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -247,7 +254,14 @@ func createTenant(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -256,7 +270,14 @@ func getTenantDetails(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -265,7 +286,14 @@ func getTenantContacts(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -275,7 +303,14 @@ func requestTenantDeletion(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -284,7 +319,14 @@ func listTenantSSHKeys(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -301,7 +343,14 @@ func generateTenantSSHKey(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -310,7 +359,14 @@ func deleteTenantSSHKey(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -325,7 +381,14 @@ func updateTenantSSHKey(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -334,7 +397,14 @@ func getTenantWorkflowEmails(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -351,7 +421,14 @@ func editTenantWorkflowEmailsGeneralities(cmd *cobra.Command, args []string) err
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 

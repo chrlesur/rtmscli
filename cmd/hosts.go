@@ -141,7 +141,14 @@ func getHosts(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -158,7 +165,14 @@ func createHost(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -167,7 +181,14 @@ func getHostDetails(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -176,7 +197,14 @@ func removeHost(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -196,7 +224,14 @@ func updateHost(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -205,7 +240,14 @@ func getHostServices(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -215,7 +257,14 @@ func updateHostTags(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -226,7 +275,14 @@ func switchHostMonitoring(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -237,7 +293,14 @@ func switchHostMonitoringNotifications(cmd *cobra.Command, args []string) error 
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -246,6 +309,13 @@ func getHostsStats(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }

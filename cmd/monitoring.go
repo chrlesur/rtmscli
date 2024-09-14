@@ -43,7 +43,14 @@ func checkRTMSHealth(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -54,6 +61,13 @@ func checkSLACalculatorHealth(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }

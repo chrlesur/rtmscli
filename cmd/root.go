@@ -9,13 +9,14 @@ import (
 )
 
 const (
-	Version = "0.1.0 Alpha release" // Définissez ici le numéro de version de votre CLI
+	Version = "1.0.0 beta release" // Définissez ici le numéro de version de votre CLI
 )
 
 var (
 	cloudTempleID string
 	host          string
 	client        *api.RTMSClient
+	outputFormat  string
 )
 
 var rootCmd = &cobra.Command{
@@ -27,6 +28,11 @@ It provides commands to manage appliances, hosts, tickets, and more.`, Version),
 		// Skip client initialization for the version command
 		if cmd.Use == "version" {
 			return nil
+		}
+
+		// Validate output format
+		if outputFormat != "json" && outputFormat != "html" && outputFormat != "markdown" {
+			return fmt.Errorf("invalid output format: %s. Supported formats are json, html, and markdown", outputFormat)
 		}
 
 		// Client initialization
@@ -52,6 +58,7 @@ func Execute() error {
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&cloudTempleID, "cloud-temple-id", "c", "", "Cloud Temple ID (required for most commands)")
 	rootCmd.PersistentFlags().StringVarP(&host, "host", "H", "rtms-api.cloud-temple.com", "RTMS API host")
+	rootCmd.PersistentFlags().StringVarP(&outputFormat, "format", "f", "json", "Output format (json, html, markdown)")
 
 	// Ajout de la commande version
 	rootCmd.AddCommand(versionCmd)

@@ -115,7 +115,14 @@ func getMonitoringServices(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -136,7 +143,14 @@ func createMonitoringService(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -145,7 +159,14 @@ func getMonitoringServiceDetails(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -154,7 +175,14 @@ func removeMonitoringService(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -178,7 +206,14 @@ func updateMonitoringService(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -198,7 +233,14 @@ func getMonitoringServiceTemplates(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -218,6 +260,13 @@ func getMonitoringServicesStats(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }

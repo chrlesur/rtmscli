@@ -263,7 +263,14 @@ func getServiceNotifications(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -287,7 +294,14 @@ func getAllNotifications(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -308,7 +322,14 @@ func createNotification(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -317,7 +338,14 @@ func getNotificationDetails(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -326,7 +354,14 @@ func getTicketSuggestions(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -336,7 +371,14 @@ func attachNotificationToTicket(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -345,7 +387,14 @@ func detachNotificationFromTicket(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -361,7 +410,14 @@ func getNotificationPerimeters(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -370,7 +426,14 @@ func getNotificationPerimeterDetails(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -398,7 +461,14 @@ func updateNotificationPerimeter(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -414,7 +484,14 @@ func getNotificationStaffs(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -423,7 +500,14 @@ func getNotificationStaffDetails(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -432,7 +516,14 @@ func getNotificationTimePeriods(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -452,7 +543,14 @@ func getNotificationTimePeriodStops(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -479,7 +577,14 @@ func createNotificationTimePeriodStop(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -488,7 +593,14 @@ func getNotificationTimePeriodStopDetails(cmd *cobra.Command, args []string) err
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -497,7 +609,14 @@ func removeNotificationTimePeriodStop(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -513,7 +632,14 @@ func getNotificationTriggers(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -522,6 +648,13 @@ func getNotificationTriggerDetails(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(response))
+	// Utilisation de formatOutput pour formater la réponse
+	formattedOutput, err := formatOutput(response)
+	if err != nil {
+		return err
+	}
+
+	// Affichage de la réponse formatée
+	fmt.Println(formattedOutput)
 	return nil
 }

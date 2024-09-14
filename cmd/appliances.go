@@ -25,7 +25,14 @@ var getAppliancesCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Println(string(response))
+		// Utilisation de formatOutput pour formater la réponse
+		formattedOutput, err := formatOutput(response)
+		if err != nil {
+			return err
+		}
+
+		// Affichage de la réponse formatée
+		fmt.Println(formattedOutput)
 		return nil
 	},
 }
@@ -39,7 +46,14 @@ var getApplianceDetailsCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Println(string(response))
+		// Utilisation de formatOutput pour formater la réponse
+		formattedOutput, err := formatOutput(response)
+		if err != nil {
+			return err
+		}
+
+		// Affichage de la réponse formatée
+		fmt.Println(formattedOutput)
 		return nil
 	},
 }
@@ -53,7 +67,14 @@ var getApplianceServicesCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Println(string(response))
+		// Utilisation de formatOutput pour formater la réponse
+		formattedOutput, err := formatOutput(response)
+		if err != nil {
+			return err
+		}
+
+		// Affichage de la réponse formatée
+		fmt.Println(formattedOutput)
 		return nil
 	},
 }
@@ -67,7 +88,14 @@ var synchronizeApplianceCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Println(string(response))
+		// Utilisation de formatOutput pour formater la réponse
+		formattedOutput, err := formatOutput(response)
+		if err != nil {
+			return err
+		}
+
+		// Affichage de la réponse formatée
+		fmt.Println(formattedOutput)
 		return nil
 	},
 }
@@ -83,7 +111,14 @@ var getApplianceConfigurationCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Println(string(response))
+		// Utilisation de formatOutput pour formater la réponse
+		formattedOutput, err := formatOutput(response)
+		if err != nil {
+			return err
+		}
+
+		// Affichage de la réponse formatée
+		fmt.Println(formattedOutput)
 		return nil
 	},
 }
@@ -104,7 +139,14 @@ var getApplianceHealthCheckCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Println(string(response))
+		// Utilisation de formatOutput pour formater la réponse
+		formattedOutput, err := formatOutput(response)
+		if err != nil {
+			return err
+		}
+
+		// Affichage de la réponse formatée
+		fmt.Println(formattedOutput)
 		return nil
 	},
 }
@@ -128,7 +170,14 @@ var postApplianceHealthCheckCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Println(string(response))
+		// Utilisation de formatOutput pour formater la réponse
+		formattedOutput, err := formatOutput(response)
+		if err != nil {
+			return err
+		}
+
+		// Affichage de la réponse formatée
+		fmt.Println(formattedOutput)
 		return nil
 	},
 }

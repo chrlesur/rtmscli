@@ -24,7 +24,14 @@ var getCatalogsCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Println(string(response))
+		// Utilisation de formatOutput pour formater la réponse
+		formattedOutput, err := formatOutput(response)
+		if err != nil {
+			return err
+		}
+
+		// Affichage de la réponse formatée
+		fmt.Println(formattedOutput)
 		return nil
 	},
 }
@@ -40,7 +47,14 @@ var getDefaultCatalogsCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Println(string(response))
+		// Utilisation de formatOutput pour formater la réponse
+		formattedOutput, err := formatOutput(response)
+		if err != nil {
+			return err
+		}
+
+		// Affichage de la réponse formatée
+		fmt.Println(formattedOutput)
 		return nil
 	},
 }
@@ -61,7 +75,14 @@ var getCatalogItemsCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Println(string(response))
+		// Utilisation de formatOutput pour formater la réponse
+		formattedOutput, err := formatOutput(response)
+		if err != nil {
+			return err
+		}
+
+		// Affichage de la réponse formatée
+		fmt.Println(formattedOutput)
 		return nil
 	},
 }
@@ -77,7 +98,14 @@ var getRootCatalogCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Println(string(response))
+		// Utilisation de formatOutput pour formater la réponse
+		formattedOutput, err := formatOutput(response)
+		if err != nil {
+			return err
+		}
+
+		// Affichage de la réponse formatée
+		fmt.Println(formattedOutput)
 		return nil
 	},
 }
