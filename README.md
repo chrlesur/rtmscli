@@ -5,7 +5,8 @@ RTMS CLI is a command-line interface for interacting with the RTMS (Real-Time Mo
 
 ## Version
 
-- 20240914 - 1.00 Beta Release 
+- 20240914 - 1.0.0 Beta Release 
+- 20240914 - 1.1.0 Beta Release - Enhanced catalogs and appliances management - Enhanced markdown output.
 
 ## Features
 
