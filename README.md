@@ -5,7 +5,8 @@ RTMS CLI is a command-line interface for interacting with the RTMS (Real-Time Mo
 
 ## Version
 
-- 20240914 - 1.00 Beta Release 
+- 20240914 - 1.0.0 Beta Release 
+- 20240914 - 1.1.0 Beta Release - Enhanced catalogs and appliances management - Enhanced markdown output.
 
 ## Features
 
@@ -93,6 +94,7 @@ Before using RTMS CLI, you need to configure your RTMS API key. Set the `RTMS_AP
 ```
 setx RTMS_API_KEY "your_api_key_here"
 ```
+note : reload your shell after
 
 #### macOS and Linux
 ```
@@ -118,7 +120,7 @@ Here are some basic usage examples of RTMS CLI:
 rtmscli version
 
 # List appliances
-rtmscli -c cloud_temple_id get-appliances list
+rtmscli -c cloud_temple_id appliances list
 
 # Create a ticket
 rtmscli -c cloud_temple_id tickets create --name="New ticket" --description="Ticket description"

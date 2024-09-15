@@ -1,99 +1,119 @@
-# Appliance Management
+# Appliances
 
-The RTMS CLI provides several commands for managing appliances. This document outlines the available commands and their usage.
+The `appliances` command allows you to manage and interact with appliances in the RTMS system.
+
+## Usage
+
+```
+rtmscli appliances [command]
+```
 
 ## Available Commands
 
-- `rtmscli get-appliances`: List all appliances
-- `rtmscli get-appliance-details`: Get details of a specific appliance
-- `rtmscli get-appliance-services`: Get services of a specific appliance
-- `rtmscli synchronize-appliance`: Synchronize an appliance
-- `rtmscli get-appliance-healthcheck`: Get or post appliance health check
+### list
 
-## Usage Examples
-
-### List Appliances
-
-To list all appliances:
+Get a list of appliances.
 
 ```
-rtmscli get-appliances
+rtmscli appliances list
 ```
 
-Options:
-- `--cloud-temple-id`: Specify the Cloud Temple ID (**required**)
+Flags:
+- `--cloud-temple-id string`: Cloud Temple Tenant identifier (required)
 
+### details
 
-### Get Appliance Details
-
-To get details of a specific appliance:
-
-```
-rtmscli get-appliance-details [appliance-id]
-```
-
-Example:
-```
-rtmscli get-appliance-details 12345
-```
-
-### Get Appliance Services
-
-To get services of a specific appliance:
+Get Appliance details.
 
 ```
-rtmscli  get-appliance-services [appliance-id]
+rtmscli appliances details [id]
 ```
 
-Example:
-```
-rtmscli  get-appliance-services 12345
-```
+### services
 
-### Synchronize Appliance
-
-To synchronize an appliance:
+Get Appliance services.
 
 ```
-rtmscli synchronize-appliance [appliance-id]
+rtmscli appliances services [id]
 ```
 
-Example:
-```
-rtmscli synchronize-appliance 12345
-```
+### synchronize
 
-### Get Appliance Configuration
-
-To get the configuration of an appliance:
+Synchronize Appliance.
 
 ```
-rtmscli appliances configuration [appliance-id] --appliance-version=[version] --plugins-path=[path]
+rtmscli appliances synchronize [id]
 ```
 
-Example:
-```
-rtmscli appliances configuration 12345 --appliance-version=1.0.0 --plugins-path=/path/to/plugins
-```
+### configuration
 
-### Appliance Health Check
-
-To get the last health check of an appliance:
+Get appliances configuration.
 
 ```
-rtmscli get-appliance-healthcheck [appliance-id]
+rtmscli appliances configuration [id]
 ```
 
-## Common Options
+Flags:
+- `--appliance-version string`: Appliance version (required)
+- `--plugins-path string`: Absolute path to the plugins installation directory on the appliance (required)
 
-All appliance commands support the following options:
+### healthcheck
 
-- `-f, --format`: Specify output format (json, html, markdown)
-- `-H, --host`: Specify the RTMS API host (default is "rtms-api.cloud-temple.com")
+Get a last heartbeat of an appliance.
 
-Example using format option:
 ```
-rtmscli -f markdown get-appliances --cloud-temple-id=your_id
+rtmscli appliances healthcheck [id]
 ```
 
-For more detailed information on each command and its options, use the `--help` flag:
+### post-healthcheck
+
+Posts an appliance heartbeat.
+
+```
+rtmscli appliances post-healthcheck [id]
+```
+
+Flags:
+- `--appliance-version string`: Appliance version (required)
+- `--nagios-operating-state string`: Nagios operating state (OK, WARNING, CRITICAL) (required)
+- `--details string`: Any details to explain the current operating state
+
+## Examples
+
+1. List all appliances:
+   ```
+   rtmscli appliances list --cloud-temple-id your-cloud-temple-id
+   ```
+
+2. Get details of a specific appliance:
+   ```
+   rtmscli appliances details 12345
+   ```
+
+3. Get services of a specific appliance:
+   ```
+   rtmscli appliances services 12345
+   ```
+
+4. Synchronize a specific appliance:
+   ```
+   rtmscli appliances synchronize 12345
+   ```
+
+5. Get configuration of a specific appliance:
+   ```
+   rtmscli appliances configuration 12345 --appliance-version 1.0.0 --plugins-path /path/to/plugins
+   ```
+
+6. Get the last heartbeat of a specific appliance:
+   ```
+   rtmscli appliances healthcheck 12345
+   ```
+
+7. Post a heartbeat for a specific appliance:
+   ```
+   rtmscli appliances post-healthcheck 12345 --appliance-version 1.0.0 --nagios-operating-state OK --details "Everything is running smoothly"
+   ```
+
+For more information on a specific command, use `rtmscli appliances [command] --help`.
+```

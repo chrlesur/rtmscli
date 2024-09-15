@@ -6,17 +6,27 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var catalogsCmd = &cobra.Command{
+	Use:   "catalogs",
+	Short: "Manage ticket classification catalogs",
+	Long:  `Commands to manage and interact with ticket classification catalogs in the RTMS system.`,
+}
+
 func init() {
-	rootCmd.AddCommand(getCatalogsCmd)
-	rootCmd.AddCommand(getDefaultCatalogsCmd)
-	rootCmd.AddCommand(getCatalogItemsCmd)
-	rootCmd.AddCommand(getRootCatalogCmd)
+	rootCmd.AddCommand(catalogsCmd)
+
+	// Subcommands
+	catalogsCmd.AddCommand(getCatalogsCmd)
+	catalogsCmd.AddCommand(getDefaultCatalogsCmd)
+	catalogsCmd.AddCommand(getCatalogItemsCmd)
+	catalogsCmd.AddCommand(getRootCatalogCmd)
 }
 
 var getCatalogsCmd = &cobra.Command{
-	Use:   "get-catalogs",
+	Use:   "list",
 	Short: "Get a list of Ticket classification catalogs and items",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		cloudTempleID, _ := cmd.Flags().GetString("cloud-temple-id")
 		availableItems, _ := cmd.Flags().GetBool("available-items")
 		isRoot, _ := cmd.Flags().GetBool("is-root")
 
@@ -24,20 +34,17 @@ var getCatalogsCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		// Utilisation de formatOutput pour formater la réponse
 		formattedOutput, err := formatOutput(response)
 		if err != nil {
 			return err
 		}
-
-		// Affichage de la réponse formatée
 		fmt.Println(formattedOutput)
 		return nil
 	},
 }
 
 var getDefaultCatalogsCmd = &cobra.Command{
-	Use:   "get-default-catalogs",
+	Use:   "defaults",
 	Short: "Get a list of all default ticket classification catalogs and catalog items",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		availableItems, _ := cmd.Flags().GetBool("available-items")
@@ -47,20 +54,17 @@ var getDefaultCatalogsCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		// Utilisation de formatOutput pour formater la réponse
 		formattedOutput, err := formatOutput(response)
 		if err != nil {
 			return err
 		}
-
-		// Affichage de la réponse formatée
 		fmt.Println(formattedOutput)
 		return nil
 	},
 }
 
 var getCatalogItemsCmd = &cobra.Command{
-	Use:   "get-catalog-items [catalog-id]",
+	Use:   "items [catalog-id]",
 	Short: "Get a list of items for a catalog",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -75,20 +79,17 @@ var getCatalogItemsCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		// Utilisation de formatOutput pour formater la réponse
 		formattedOutput, err := formatOutput(response)
 		if err != nil {
 			return err
 		}
-
-		// Affichage de la réponse formatée
 		fmt.Println(formattedOutput)
 		return nil
 	},
 }
 
 var getRootCatalogCmd = &cobra.Command{
-	Use:   "get-root-catalog",
+	Use:   "root",
 	Short: "Get the root required catalog",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		catalogType, _ := cmd.Flags().GetString("type")
@@ -98,13 +99,10 @@ var getRootCatalogCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		// Utilisation de formatOutput pour formater la réponse
 		formattedOutput, err := formatOutput(response)
 		if err != nil {
 			return err
 		}
-
-		// Affichage de la réponse formatée
 		fmt.Println(formattedOutput)
 		return nil
 	},
