@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -67,35 +68,67 @@ func jsonToMarkdown(data []byte) (string, error) {
 		return "", err
 	}
 
-	markdown := ""
-	markdown += jsonToMarkdownRecursive(jsonData, 0)
-
-	return markdown, nil
+	return jsonToMarkdownTable(jsonData), nil
 }
 
-func jsonToMarkdownRecursive(data interface{}, depth int) string {
-	markdown := ""
-	indent := strings.Repeat("  ", depth)
-
+func jsonToMarkdownTable(data interface{}) string {
 	switch v := data.(type) {
 	case map[string]interface{}:
-		for key, value := range v {
-			markdown += fmt.Sprintf("%s- **%s**: ", indent, key)
-			markdown += jsonToMarkdownRecursive(value, depth+1)
-			markdown += "\n"
-		}
+		return mapToMarkdownTable(v)
 	case []interface{}:
-		markdown += "\n"
-		for _, item := range v {
-			markdown += fmt.Sprintf("%s- ", indent)
-			markdown += jsonToMarkdownRecursive(item, depth+1)
-			markdown += "\n"
-		}
+		return sliceToMarkdownTable(v)
 	default:
-		markdown += fmt.Sprintf("%v", v)
+		return fmt.Sprintf("%v", v)
+	}
+}
+
+func mapToMarkdownTable(m map[string]interface{}) string {
+	var sb strings.Builder
+	sb.WriteString("| Key | Value |\n|-----|-------|\n")
+
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		v := m[k]
+		sb.WriteString(fmt.Sprintf("| %s | ", k))
+		switch innerV := v.(type) {
+		case map[string]interface{}:
+			sb.WriteString(mapToMarkdownTable(innerV))
+		case []interface{}:
+			sb.WriteString(sliceToMarkdownTable(innerV))
+		default:
+			sb.WriteString(fmt.Sprintf("%v", innerV))
+		}
+		sb.WriteString(" |\n")
+	}
+	return sb.String()
+}
+
+func sliceToMarkdownTable(s []interface{}) string {
+	if len(s) == 0 {
+		return "Empty array"
 	}
 
-	return markdown
+	var sb strings.Builder
+	sb.WriteString("| Index | Value |\n|-------|-------|\n")
+
+	for i, v := range s {
+		sb.WriteString(fmt.Sprintf("| %d | ", i))
+		switch innerV := v.(type) {
+		case map[string]interface{}:
+			sb.WriteString(mapToMarkdownTable(innerV))
+		case []interface{}:
+			sb.WriteString(sliceToMarkdownTable(innerV))
+		default:
+			sb.WriteString(fmt.Sprintf("%v", innerV))
+		}
+		sb.WriteString(" |\n")
+	}
+	return sb.String()
 }
 
 func intSliceToString(slice []int) string {

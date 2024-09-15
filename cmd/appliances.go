@@ -6,18 +6,27 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var appliancesCmd = &cobra.Command{
+	Use:   "appliances",
+	Short: "Manage appliances",
+	Long:  `Commands to manage and interact with appliances in the RTMS system.`,
+}
+
 func init() {
-	rootCmd.AddCommand(getAppliancesCmd)
-	rootCmd.AddCommand(getApplianceDetailsCmd)
-	rootCmd.AddCommand(getApplianceServicesCmd)
-	rootCmd.AddCommand(synchronizeApplianceCmd)
-	rootCmd.AddCommand(getApplianceConfigurationCmd)
-	rootCmd.AddCommand(getApplianceHealthCheckCmd)
-	rootCmd.AddCommand(postApplianceHealthCheckCmd)
+	rootCmd.AddCommand(appliancesCmd)
+
+	// Subcommands
+	appliancesCmd.AddCommand(getAppliancesCmd)
+	appliancesCmd.AddCommand(getApplianceDetailsCmd)
+	appliancesCmd.AddCommand(getApplianceServicesCmd)
+	appliancesCmd.AddCommand(synchronizeApplianceCmd)
+	appliancesCmd.AddCommand(getApplianceConfigurationCmd)
+	appliancesCmd.AddCommand(getApplianceHealthCheckCmd)
+	appliancesCmd.AddCommand(postApplianceHealthCheckCmd)
 }
 
 var getAppliancesCmd = &cobra.Command{
-	Use:   "get-appliances",
+	Use:   "list",
 	Short: "Get a list of appliances",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cloudTempleID, _ := cmd.Flags().GetString("cloud-temple-id")
@@ -25,20 +34,17 @@ var getAppliancesCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		// Utilisation de formatOutput pour formater la réponse
 		formattedOutput, err := formatOutput(response)
 		if err != nil {
 			return err
 		}
-
-		// Affichage de la réponse formatée
 		fmt.Println(formattedOutput)
 		return nil
 	},
 }
 
 var getApplianceDetailsCmd = &cobra.Command{
-	Use:   "get-appliance-details [id]",
+	Use:   "details [id]",
 	Short: "Get Appliance details",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -46,20 +52,17 @@ var getApplianceDetailsCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		// Utilisation de formatOutput pour formater la réponse
 		formattedOutput, err := formatOutput(response)
 		if err != nil {
 			return err
 		}
-
-		// Affichage de la réponse formatée
 		fmt.Println(formattedOutput)
 		return nil
 	},
 }
 
 var getApplianceServicesCmd = &cobra.Command{
-	Use:   "get-appliance-services [id]",
+	Use:   "services [id]",
 	Short: "Get Appliance services",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -67,20 +70,17 @@ var getApplianceServicesCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		// Utilisation de formatOutput pour formater la réponse
 		formattedOutput, err := formatOutput(response)
 		if err != nil {
 			return err
 		}
-
-		// Affichage de la réponse formatée
 		fmt.Println(formattedOutput)
 		return nil
 	},
 }
 
 var synchronizeApplianceCmd = &cobra.Command{
-	Use:   "synchronize-appliance [id]",
+	Use:   "synchronize [id]",
 	Short: "Synchronize Appliance",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -88,20 +88,17 @@ var synchronizeApplianceCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		// Utilisation de formatOutput pour formater la réponse
 		formattedOutput, err := formatOutput(response)
 		if err != nil {
 			return err
 		}
-
-		// Affichage de la réponse formatée
 		fmt.Println(formattedOutput)
 		return nil
 	},
 }
 
 var getApplianceConfigurationCmd = &cobra.Command{
-	Use:   "get-appliance-configuration [id]",
+	Use:   "configuration [id]",
 	Short: "Get appliances configuration",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -111,27 +108,17 @@ var getApplianceConfigurationCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		// Utilisation de formatOutput pour formater la réponse
 		formattedOutput, err := formatOutput(response)
 		if err != nil {
 			return err
 		}
-
-		// Affichage de la réponse formatée
 		fmt.Println(formattedOutput)
 		return nil
 	},
 }
 
-func init() {
-	getApplianceConfigurationCmd.Flags().String("appliance-version", "", "Appliance version")
-	getApplianceConfigurationCmd.Flags().String("plugins-path", "", "Absolute path to the plugins installation directory on the appliance")
-	getApplianceConfigurationCmd.MarkFlagRequired("appliance-version")
-	getApplianceConfigurationCmd.MarkFlagRequired("plugins-path")
-}
-
 var getApplianceHealthCheckCmd = &cobra.Command{
-	Use:   "get-appliance-healthcheck [id]",
+	Use:   "healthcheck [id]",
 	Short: "Get a last heartbeat of an appliance",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -139,20 +126,17 @@ var getApplianceHealthCheckCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		// Utilisation de formatOutput pour formater la réponse
 		formattedOutput, err := formatOutput(response)
 		if err != nil {
 			return err
 		}
-
-		// Affichage de la réponse formatée
 		fmt.Println(formattedOutput)
 		return nil
 	},
 }
 
 var postApplianceHealthCheckCmd = &cobra.Command{
-	Use:   "post-appliance-healthcheck [id]",
+	Use:   "post-healthcheck [id]",
 	Short: "Posts an appliance heartbeat",
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -170,19 +154,21 @@ var postApplianceHealthCheckCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		// Utilisation de formatOutput pour formater la réponse
 		formattedOutput, err := formatOutput(response)
 		if err != nil {
 			return err
 		}
-
-		// Affichage de la réponse formatée
 		fmt.Println(formattedOutput)
 		return nil
 	},
 }
 
 func init() {
+	getApplianceConfigurationCmd.Flags().String("appliance-version", "", "Appliance version")
+	getApplianceConfigurationCmd.Flags().String("plugins-path", "", "Absolute path to the plugins installation directory on the appliance")
+	getApplianceConfigurationCmd.MarkFlagRequired("appliance-version")
+	getApplianceConfigurationCmd.MarkFlagRequired("plugins-path")
+
 	postApplianceHealthCheckCmd.Flags().String("appliance-version", "", "Appliance version")
 	postApplianceHealthCheckCmd.Flags().String("nagios-operating-state", "", "Nagios operating state (OK, WARNING, CRITICAL)")
 	postApplianceHealthCheckCmd.Flags().String("details", "", "Any details to explain the current operating state")
