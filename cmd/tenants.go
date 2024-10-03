@@ -19,11 +19,32 @@ func init() {
 	getTenantsCmd := &cobra.Command{
 		Use:   "list",
 		Short: "Get a list of Tenants",
-		RunE:  getTenants,
 	}
 	getTenantsCmd.Flags().String("name", "", "Filter tenants by name")
 	getTenantsCmd.Flags().Int("responsible-team-id", 0, "Filter tenants by responsible team ID")
 	getTenantsCmd.Flags().Int("sdm-id", 0, "Filter tenants by SDM ID")
+
+	updateListCommand(getTenantsCmd, "/tenants", func() map[string]string {
+		params := make(map[string]string)
+
+		name, _ := getTenantsCmd.Flags().GetString("name")
+		if name != "" {
+			params["name"] = name
+		}
+
+		responsibleTeamID, _ := getTenantsCmd.Flags().GetInt("responsible-team-id")
+		if responsibleTeamID != 0 {
+			params["responsibleTeamId"] = fmt.Sprintf("%d", responsibleTeamID)
+		}
+
+		sdmID, _ := getTenantsCmd.Flags().GetInt("sdm-id")
+		if sdmID != 0 {
+			params["sdmId"] = fmt.Sprintf("%d", sdmID)
+		}
+
+		return params
+	})
+
 	tenantsCmd.AddCommand(getTenantsCmd)
 
 	// Create tenant
@@ -196,6 +217,7 @@ func getTenants(cmd *cobra.Command, args []string) error {
 	name, _ := cmd.Flags().GetString("name")
 	responsibleTeamID, _ := cmd.Flags().GetInt("responsible-team-id")
 	sdmID, _ := cmd.Flags().GetInt("sdm-id")
+	format, _ := cmd.Flags().GetString("format")
 
 	params := make(map[string]string)
 	if name != "" {
@@ -213,7 +235,7 @@ func getTenants(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -235,6 +257,7 @@ func createTenant(cmd *cobra.Command, args []string) error {
 	watchers, _ := cmd.Flags().GetStringSlice("watchers")
 	isEnabled, _ := cmd.Flags().GetBool("is-enabled")
 	cloudTempleID, _ := cmd.Flags().GetString("cloud-temple-id")
+	format, _ := cmd.Flags().GetString("format")
 
 	tenantData := map[string]interface{}{
 		"name":            name,
@@ -255,7 +278,7 @@ func createTenant(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -266,12 +289,13 @@ func createTenant(cmd *cobra.Command, args []string) error {
 }
 
 func getTenantDetails(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetTenantDetails(args[0])
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -282,12 +306,13 @@ func getTenantDetails(cmd *cobra.Command, args []string) error {
 }
 
 func getTenantContacts(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetTenantContacts(args[0])
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -298,13 +323,14 @@ func getTenantContacts(cmd *cobra.Command, args []string) error {
 }
 
 func requestTenantDeletion(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	delete, _ := cmd.Flags().GetBool("delete")
 	response, err := client.RequestTenantDeletion(args[0], delete)
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -315,12 +341,13 @@ func requestTenantDeletion(cmd *cobra.Command, args []string) error {
 }
 
 func listTenantSSHKeys(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetTenantSSHKeys(args[0])
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -331,6 +358,7 @@ func listTenantSSHKeys(cmd *cobra.Command, args []string) error {
 }
 
 func generateTenantSSHKey(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	comment, _ := cmd.Flags().GetString("comment")
 	isActive, _ := cmd.Flags().GetBool("is-active")
 
@@ -344,7 +372,7 @@ func generateTenantSSHKey(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -355,12 +383,13 @@ func generateTenantSSHKey(cmd *cobra.Command, args []string) error {
 }
 
 func deleteTenantSSHKey(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.DeleteTenantSSHKey(args[0])
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -371,6 +400,7 @@ func deleteTenantSSHKey(cmd *cobra.Command, args []string) error {
 }
 
 func updateTenantSSHKey(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	isActive, _ := cmd.Flags().GetBool("is-active")
 
 	keyData := map[string]interface{}{
@@ -382,7 +412,7 @@ func updateTenantSSHKey(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -393,12 +423,13 @@ func updateTenantSSHKey(cmd *cobra.Command, args []string) error {
 }
 
 func getTenantWorkflowEmails(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetTenantWorkflowEmails(args[0])
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -422,7 +453,7 @@ func editTenantWorkflowEmailsGeneralities(cmd *cobra.Command, args []string) err
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}

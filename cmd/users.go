@@ -20,12 +20,35 @@ func init() {
 	getUsersCmd := &cobra.Command{
 		Use:   "list",
 		Short: "Get a list of users",
-		RunE:  getUsers,
 	}
 	getUsersCmd.Flags().String("name", "", "Filter users by name")
 	getUsersCmd.Flags().Bool("enabled", true, "Filter by enabled users")
 	getUsersCmd.Flags().String("email", "", "Filter users by email address")
 	getUsersCmd.Flags().Bool("is-contact", false, "Show only contact users for the tenant")
+
+	updateListCommand(getUsersCmd, "/users", func() map[string]string {
+		params := make(map[string]string)
+		params["cloudTempleId"] = cloudTempleID
+
+		name, _ := getUsersCmd.Flags().GetString("name")
+		if name != "" {
+			params["name"] = name
+		}
+
+		enabled, _ := getUsersCmd.Flags().GetBool("enabled")
+		params["enabled"] = strconv.FormatBool(enabled)
+
+		email, _ := getUsersCmd.Flags().GetString("email")
+		if email != "" {
+			params["email"] = email
+		}
+
+		isContact, _ := getUsersCmd.Flags().GetBool("is-contact")
+		params["isContact"] = strconv.FormatBool(isContact)
+
+		return params
+	})
+
 	usersCmd.AddCommand(getUsersCmd)
 
 	// Create user
@@ -95,6 +118,7 @@ func init() {
 }
 
 func getUsers(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	name, _ := cmd.Flags().GetString("name")
 	enabled, _ := cmd.Flags().GetBool("enabled")
 	email, _ := cmd.Flags().GetString("email")
@@ -115,7 +139,7 @@ func getUsers(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -126,6 +150,7 @@ func getUsers(cmd *cobra.Command, args []string) error {
 }
 
 func createUser(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	firstname, _ := cmd.Flags().GetString("firstname")
 	lastname, _ := cmd.Flags().GetString("lastname")
 	email, _ := cmd.Flags().GetString("email")
@@ -149,7 +174,7 @@ func createUser(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -160,12 +185,13 @@ func createUser(cmd *cobra.Command, args []string) error {
 }
 
 func getUserDetails(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetUserDetails(args[0])
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -176,6 +202,7 @@ func getUserDetails(cmd *cobra.Command, args []string) error {
 }
 
 func updateUser(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	firstname, _ := cmd.Flags().GetString("firstname")
 	lastname, _ := cmd.Flags().GetString("lastname")
 	email, _ := cmd.Flags().GetString("email")
@@ -208,7 +235,7 @@ func updateUser(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -219,12 +246,13 @@ func updateUser(cmd *cobra.Command, args []string) error {
 }
 
 func getWhoAmI(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetWhoAmI()
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -235,12 +263,13 @@ func getWhoAmI(cmd *cobra.Command, args []string) error {
 }
 
 func getNotAssignedUser(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetNotAssignedUser()
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -251,12 +280,13 @@ func getNotAssignedUser(cmd *cobra.Command, args []string) error {
 }
 
 func getOnDelegationUser(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetOnDelegationUser()
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}

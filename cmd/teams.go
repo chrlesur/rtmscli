@@ -19,8 +19,14 @@ func init() {
 	getTeamsCmd := &cobra.Command{
 		Use:   "list",
 		Short: "Get a list of Teams",
-		RunE:  getTeams,
 	}
+
+	updateListCommand(getTeamsCmd, "/teams", func() map[string]string {
+		return map[string]string{
+			"cloudTempleId": cloudTempleID,
+		}
+	})
+
 	teamsCmd.AddCommand(getTeamsCmd)
 
 	// Create team
@@ -79,27 +85,12 @@ func init() {
 	teamsCmd.AddCommand(editTeamCmd)
 }
 
-func getTeams(cmd *cobra.Command, args []string) error {
-	response, err := client.GetTeams(cloudTempleID, nil)
-	if err != nil {
-		return err
-	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
-	if err != nil {
-		return err
-	}
-
-	// Affichage de la réponse formatée
-	fmt.Println(formattedOutput)
-	return nil
-}
-
 func createTeam(cmd *cobra.Command, args []string) error {
 	name, _ := cmd.Flags().GetString("name")
 	information, _ := cmd.Flags().GetString("information")
 	contacts, _ := cmd.Flags().GetStringSlice("contacts")
 	members, _ := cmd.Flags().GetIntSlice("members")
+	format, _ := cmd.Flags().GetString("format")
 
 	teamData := map[string]interface{}{
 		"name": name,
@@ -118,61 +109,52 @@ func createTeam(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
-
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func getDefaultTeams(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetDefaultTeams(nil)
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
-
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func getTeamDetails(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetTeamDetails(args[0])
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
-
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func removeTeam(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.RemoveTeam(args[0])
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
-
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
@@ -185,6 +167,7 @@ func editTeam(cmd *cobra.Command, args []string) error {
 	removeContacts, _ := cmd.Flags().GetStringSlice("remove-contacts")
 	addMembers, _ := cmd.Flags().GetIntSlice("add-members")
 	removeMembers, _ := cmd.Flags().GetIntSlice("remove-members")
+	format, _ := cmd.Flags().GetString("format")
 
 	teamData := make(map[string]interface{})
 	if name != "" {
@@ -213,13 +196,10 @@ func editTeam(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
-
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }

@@ -3,132 +3,123 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	"sort"
+	"os"
+	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/spf13/cobra"
 )
 
-func formatOutput(data []byte) (string, error) {
-	switch outputFormat {
+func formatOutput(data interface{}, format string) (string, error) {
+	switch strings.ToLower(format) {
 	case "json":
-		return string(data), nil
-	case "html":
-		return jsonToHTML(data)
-	case "markdown":
-		return jsonToMarkdown(data)
+		return formatJSON(data)
+	case "text":
+		return formatText(data)
 	default:
-		return "", fmt.Errorf("unsupported output format: %s", outputFormat)
+		return "", fmt.Errorf("format non pris en charge : %s", format)
 	}
 }
 
-func jsonToHTML(data []byte) (string, error) {
-	var jsonData interface{}
-	err := json.Unmarshal(data, &jsonData)
+func formatJSON(data interface{}) (string, error) {
+	jsonBytes, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("erreur lors de la conversion en JSON : %w", err)
 	}
-
-	html := "<table>\n"
-	html += jsonToHTMLRecursive(jsonData, 0)
-	html += "</table>"
-
-	return html, nil
+	return string(jsonBytes), nil
 }
 
-func jsonToHTMLRecursive(data interface{}, depth int) string {
-	html := ""
-	indent := strings.Repeat("  ", depth)
+func formatText(data interface{}) (string, error) {
+	return formatTextRecursive(data, 0), nil
+}
 
-	switch v := data.(type) {
-	case map[string]interface{}:
-		for key, value := range v {
-			html += fmt.Sprintf("%s<tr><th>%s</th><td>", indent, key)
-			html += jsonToHTMLRecursive(value, depth+1)
-			html += "</td></tr>\n"
+func formatTextRecursive(v interface{}, indent int) string {
+	indentStr := strings.Repeat("  ", indent)
+
+	switch reflect.TypeOf(v).Kind() {
+	case reflect.Map:
+		var builder strings.Builder
+		val := reflect.ValueOf(v)
+		for _, key := range val.MapKeys() {
+			builder.WriteString(fmt.Sprintf("%s%v: %s\n", indentStr, key, formatTextRecursive(val.MapIndex(key).Interface(), indent+1)))
 		}
-	case []interface{}:
-		html += "<ul>\n"
-		for _, item := range v {
-			html += fmt.Sprintf("%s<li>", indent)
-			html += jsonToHTMLRecursive(item, depth+1)
-			html += "</li>\n"
+		return builder.String()
+	case reflect.Slice, reflect.Array:
+		var builder strings.Builder
+		val := reflect.ValueOf(v)
+		for i := 0; i < val.Len(); i++ {
+			builder.WriteString(fmt.Sprintf("%s- %s\n", indentStr, formatTextRecursive(val.Index(i).Interface(), indent+1)))
 		}
-		html += indent + "</ul>\n"
-	default:
-		html += fmt.Sprintf("%v", v)
-	}
-
-	return html
-}
-
-func jsonToMarkdown(data []byte) (string, error) {
-	var jsonData interface{}
-	err := json.Unmarshal(data, &jsonData)
-	if err != nil {
-		return "", err
-	}
-
-	return jsonToMarkdownTable(jsonData), nil
-}
-
-func jsonToMarkdownTable(data interface{}) string {
-	switch v := data.(type) {
-	case map[string]interface{}:
-		return mapToMarkdownTable(v)
-	case []interface{}:
-		return sliceToMarkdownTable(v)
+		return builder.String()
 	default:
 		return fmt.Sprintf("%v", v)
 	}
 }
 
-func mapToMarkdownTable(m map[string]interface{}) string {
-	var sb strings.Builder
-	sb.WriteString("| Key | Value |\n|-----|-------|\n")
+func updateListCommand(cmd *cobra.Command, endpoint string, paramsFunc func() map[string]string) {
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		params := paramsFunc()
 
-	keys := make([]string, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-
-	for _, k := range keys {
-		v := m[k]
-		sb.WriteString(fmt.Sprintf("| %s | ", k))
-		switch innerV := v.(type) {
-		case map[string]interface{}:
-			sb.WriteString(mapToMarkdownTable(innerV))
-		case []interface{}:
-			sb.WriteString(sliceToMarkdownTable(innerV))
-		default:
-			sb.WriteString(fmt.Sprintf("%v", innerV))
+		// Ajout du filtre s'il est spécifié
+		if filter != "" {
+			params["filter"] = filter
 		}
-		sb.WriteString(" |\n")
-	}
-	return sb.String()
-}
 
-func sliceToMarkdownTable(s []interface{}) string {
-	if len(s) == 0 {
-		return "Empty array"
-	}
+		// Utilisation de StreamData pour récupérer les données
+		dataChan, errChan := client.StreamData(endpoint, params, batchSize)
 
-	var sb strings.Builder
-	sb.WriteString("| Index | Value |\n|-------|-------|\n")
+		count := 0
+		var data []interface{}
 
-	for i, v := range s {
-		sb.WriteString(fmt.Sprintf("| %d | ", i))
-		switch innerV := v.(type) {
-		case map[string]interface{}:
-			sb.WriteString(mapToMarkdownTable(innerV))
-		case []interface{}:
-			sb.WriteString(sliceToMarkdownTable(innerV))
-		default:
-			sb.WriteString(fmt.Sprintf("%v", innerV))
+		// Canal pour signaler l'arrêt de la collecte de données
+		done := make(chan struct{})
+
+		// Goroutine pour collecter les données
+		go func() {
+			defer close(done)
+			for item := range dataChan {
+				data = append(data, item)
+				count++
+				if limit > 0 && count >= limit {
+					return
+				}
+			}
+		}()
+
+		// Attente de la fin de la collecte ou d'une erreur
+		select {
+		case <-done:
+			// La collecte est terminée normalement
+		case err := <-errChan:
+			if err != nil {
+				return fmt.Errorf("erreur lors de la récupération des données : %w", err)
+			}
 		}
-		sb.WriteString(" |\n")
+
+		// Vérification si des données ont été récupérées
+		if len(data) == 0 {
+			fmt.Println("Aucune donnée n'a été trouvée.")
+			return nil
+		}
+
+		// Formatage de la sortie
+		output, err := formatOutput(data, outputFormat)
+		if err != nil {
+			return fmt.Errorf("erreur lors du formatage de la sortie : %w", err)
+		}
+
+		// Affichage de la sortie
+		fmt.Fprintln(os.Stdout, output)
+
+		return nil
 	}
-	return sb.String()
+
+	// Ajout des flags communs
+	cmd.Flags().IntVar(&limit, "limit", 0, "Limite le nombre de résultats retournés")
+	cmd.Flags().IntVar(&batchSize, "batch-size", 100, "Nombre d'éléments à récupérer par lot")
+	cmd.Flags().StringVar(&filter, "filter", "", "Filtre les résultats (format dépendant de la commande)")
+	cmd.Flags().StringVar(&outputFormat, "output-format", "json", "Format de sortie (json, text)")
 }
 
 func intSliceToString(slice []int) string {

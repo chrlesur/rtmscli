@@ -38,36 +38,32 @@ func init() {
 func checkRTMSHealth(cmd *cobra.Command, args []string) error {
 	integrationServices, _ := cmd.Flags().GetIntSlice("integration-services")
 	integrationDelay, _ := cmd.Flags().GetInt("integration-delay")
+	format, _ := cmd.Flags().GetString("format")
 
 	response, err := client.CheckRTMSHealth(integrationServices, integrationDelay)
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
-
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func checkSLACalculatorHealth(cmd *cobra.Command, args []string) error {
 	updateDelay, _ := cmd.Flags().GetInt("update-delay")
+	format, _ := cmd.Flags().GetString("format")
 
 	response, err := client.CheckSLACalculatorHealth(updateDelay)
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
-
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }

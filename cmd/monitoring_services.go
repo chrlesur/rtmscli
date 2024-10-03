@@ -16,15 +16,38 @@ var monitoringServicesCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(monitoringServicesCmd)
 
+	
 	// Get monitoring services
 	getMonitoringServicesCmd := &cobra.Command{
 		Use:   "list",
 		Short: "Get a list of monitoring services",
-		RunE:  getMonitoringServices,
 	}
 	getMonitoringServicesCmd.Flags().String("name", "", "Filter services by name")
 	getMonitoringServicesCmd.Flags().StringSlice("status", nil, "Filter services by status")
 	getMonitoringServicesCmd.Flags().StringSlice("impact", nil, "Filter services by impact")
+
+	updateListCommand(getMonitoringServicesCmd, "/monitoringServices", func() map[string]string {
+		params := make(map[string]string)
+		params["cloudTempleId"] = cloudTempleID
+
+		name, _ := getMonitoringServicesCmd.Flags().GetString("name")
+		if name != "" {
+			params["name"] = name
+		}
+
+		status, _ := getMonitoringServicesCmd.Flags().GetStringSlice("status")
+		if len(status) > 0 {
+			params["status[]"] = strings.Join(status, ",")
+		}
+
+		impact, _ := getMonitoringServicesCmd.Flags().GetStringSlice("impact")
+		if len(impact) > 0 {
+			params["impact[]"] = strings.Join(impact, ",")
+		}
+
+		return params
+	})
+
 	monitoringServicesCmd.AddCommand(getMonitoringServicesCmd)
 
 	// Create monitoring service
@@ -95,42 +118,12 @@ func init() {
 	monitoringServicesCmd.AddCommand(getMonitoringServicesStatsCmd)
 }
 
-func getMonitoringServices(cmd *cobra.Command, args []string) error {
-	name, _ := cmd.Flags().GetString("name")
-	status, _ := cmd.Flags().GetStringSlice("status")
-	impact, _ := cmd.Flags().GetStringSlice("impact")
-
-	params := make(map[string]string)
-	if name != "" {
-		params["name"] = name
-	}
-	if len(status) > 0 {
-		params["status[]"] = fmt.Sprintf("[%s]", strings.Join(status, ","))
-	}
-	if len(impact) > 0 {
-		params["impact[]"] = fmt.Sprintf("[%s]", strings.Join(impact, ","))
-	}
-
-	response, err := client.GetMonitoringServices(cloudTempleID, params)
-	if err != nil {
-		return err
-	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
-	if err != nil {
-		return err
-	}
-
-	// Affichage de la réponse formatée
-	fmt.Println(formattedOutput)
-	return nil
-}
-
 func createMonitoringService(cmd *cobra.Command, args []string) error {
 	name, _ := cmd.Flags().GetString("name")
 	appliance, _ := cmd.Flags().GetInt("appliance")
 	host, _ := cmd.Flags().GetInt("host")
 	template, _ := cmd.Flags().GetInt("template")
+	format, _ := cmd.Flags().GetString("format")
 
 	serviceData := map[string]interface{}{
 		"name":      name,
@@ -143,50 +136,44 @@ func createMonitoringService(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
-
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func getMonitoringServiceDetails(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetMonitoringServiceDetails(args[0])
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
-
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func removeMonitoringService(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.RemoveMonitoringService(args[0])
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
-
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func updateMonitoringService(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	serviceData := make(map[string]interface{})
 
 	if name, _ := cmd.Flags().GetString("name"); name != "" {
@@ -206,13 +193,10 @@ func updateMonitoringService(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
-
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
@@ -220,6 +204,7 @@ func updateMonitoringService(cmd *cobra.Command, args []string) error {
 func getMonitoringServiceTemplates(cmd *cobra.Command, args []string) error {
 	name, _ := cmd.Flags().GetString("name")
 	impact, _ := cmd.Flags().GetStringSlice("impact")
+	format, _ := cmd.Flags().GetString("format")
 
 	params := make(map[string]string)
 	if name != "" {
@@ -229,26 +214,30 @@ func getMonitoringServiceTemplates(cmd *cobra.Command, args []string) error {
 		params["impact"] = fmt.Sprintf("[%s]", strings.Join(impact, ","))
 	}
 
-	response, err := client.GetMonitoringServiceTemplates(params)
-	if err != nil {
-		return err
-	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
-	if err != nil {
-		return err
+	dataChan, errChan := client.StreamData("/monitoringServices/templates", params, batchSize)
+
+	for item := range dataChan {
+		formattedOutput, err := formatOutput(item, format)
+		if err != nil {
+			return err
+		}
+		fmt.Println(formattedOutput)
 	}
 
-	// Affichage de la réponse formatée
-	fmt.Println(formattedOutput)
+	if err := <-errChan; err != nil {
+		return fmt.Errorf("erreur lors de la récupération des templates : %w", err)
+	}
+
 	return nil
 }
 
 func getMonitoringServicesStats(cmd *cobra.Command, args []string) error {
 	hostID, _ := cmd.Flags().GetInt("host-id")
 	applianceID, _ := cmd.Flags().GetInt("appliance-id")
+	format, _ := cmd.Flags().GetString("format")
 
 	params := make(map[string]string)
+	params["cloudTempleId"] = cloudTempleID
 	if hostID != 0 {
 		params["hostId"] = fmt.Sprintf("%d", hostID)
 	}
@@ -260,13 +249,10 @@ func getMonitoringServicesStats(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
-
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }

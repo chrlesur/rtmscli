@@ -34,7 +34,8 @@ var getAppliancesCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		formattedOutput, err := formatOutput(response)
+		format, _ := cmd.Flags().GetString("format")
+		formattedOutput, err := formatOutput(response, format)
 		if err != nil {
 			return err
 		}
@@ -52,7 +53,8 @@ var getApplianceDetailsCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		formattedOutput, err := formatOutput(response)
+		format, _ := cmd.Flags().GetString("format")
+		formattedOutput, err := formatOutput(response, format)
 		if err != nil {
 			return err
 		}
@@ -70,7 +72,8 @@ var getApplianceServicesCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		formattedOutput, err := formatOutput(response)
+		format, _ := cmd.Flags().GetString("format")
+		formattedOutput, err := formatOutput(response, format)
 		if err != nil {
 			return err
 		}
@@ -88,7 +91,8 @@ var synchronizeApplianceCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		formattedOutput, err := formatOutput(response)
+		format, _ := cmd.Flags().GetString("format")
+		formattedOutput, err := formatOutput(response, format)
 		if err != nil {
 			return err
 		}
@@ -108,7 +112,8 @@ var getApplianceConfigurationCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		formattedOutput, err := formatOutput(response)
+		format, _ := cmd.Flags().GetString("format")
+		formattedOutput, err := formatOutput(response, format)
 		if err != nil {
 			return err
 		}
@@ -126,7 +131,8 @@ var getApplianceHealthCheckCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		formattedOutput, err := formatOutput(response)
+		format, _ := cmd.Flags().GetString("format")
+		formattedOutput, err := formatOutput(response, format)
 		if err != nil {
 			return err
 		}
@@ -154,7 +160,8 @@ var postApplianceHealthCheckCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		formattedOutput, err := formatOutput(response)
+		format, _ := cmd.Flags().GetString("format")
+		formattedOutput, err := formatOutput(response, format)
 		if err != nil {
 			return err
 		}

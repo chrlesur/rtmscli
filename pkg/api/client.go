@@ -818,3 +818,60 @@ func (c *RTMSClient) GetViewItems(viewType, id string, params map[string]string)
 	}
 	return c.doRequest("GET", fmt.Sprintf("/views/%s/%s", viewType, id), query, nil)
 }
+func (c *RTMSClient) StreamData(endpoint string, params map[string]string, batchSize int) (<-chan interface{}, <-chan error) {
+	dataChan := make(chan interface{})
+	errChan := make(chan error, 1)
+
+	go func() {
+		defer close(dataChan)
+		defer close(errChan)
+
+		offset := 0
+		for {
+			// Copie les paramètres originaux
+			queryParams := make(url.Values)
+			for k, v := range params {
+				queryParams.Set(k, v)
+			}
+
+			// Ajoute les paramètres de pagination
+			queryParams.Set("page", strconv.Itoa(offset/batchSize+1))
+			queryParams.Set("itemsPerPage", strconv.Itoa(batchSize))
+
+			// Effectue la requête
+			response, err := c.doRequest("GET", endpoint, queryParams, nil)
+			if err != nil {
+				errChan <- fmt.Errorf("erreur lors de la requête API : %w", err)
+				return
+			}
+
+			// Parse la réponse JSON
+			var paginatedResp struct {
+				Data       []interface{} `json:"data"`
+				Pagination struct {
+					Total int `json:"total"`
+				} `json:"pagination"`
+			}
+			err = json.Unmarshal(response, &paginatedResp)
+			if err != nil {
+				errChan <- fmt.Errorf("erreur lors du décodage JSON : %w", err)
+				return
+			}
+
+			// Envoie les données dans le canal
+			for _, item := range paginatedResp.Data {
+				dataChan <- item
+			}
+
+			// Vérifie si on a atteint la fin des données
+			if offset+len(paginatedResp.Data) >= paginatedResp.Pagination.Total {
+				return
+			}
+
+			// Met à jour l'offset pour la prochaine requête
+			offset += len(paginatedResp.Data)
+		}
+	}()
+
+	return dataChan, errChan
+}
