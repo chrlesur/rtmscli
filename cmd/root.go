@@ -63,8 +63,8 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&host, "host", "H", "rtms-api.cloud-temple.com", "Hôte de l'API RTMS")
 	rootCmd.PersistentFlags().StringVarP(&outputFormat, "format", "f", "json", "Format de sortie (json, html, markdown)")
 
-	rootCmd.PersistentFlags().IntVar(&limit, "limit", 0, "Limite le nombre de résultats retournés")
-	rootCmd.PersistentFlags().IntVar(&batchSize, "batch-size", 100, "Nombre d'éléments à récupérer par lot")
+	rootCmd.PersistentFlags().IntVarP(&limit, "limit", "l", 0, "Limite le nombre de résultats retournés (par défaut : 0 pour illimité)")
+	rootCmd.PersistentFlags().IntVar(&batchSize, "batch-size", 100, "Nombre d'éléments à récupérer par lot (par défaut 100)")
 	rootCmd.PersistentFlags().StringVar(&filter, "filter", "", "Filtre les résultats (format dépendant de la commande)")
 
 	// Ajout de la commande version
