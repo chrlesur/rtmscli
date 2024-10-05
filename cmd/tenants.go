@@ -19,11 +19,32 @@ func init() {
 	getTenantsCmd := &cobra.Command{
 		Use:   "list",
 		Short: "Get a list of Tenants",
-		RunE:  getTenants,
 	}
 	getTenantsCmd.Flags().String("name", "", "Filter tenants by name")
 	getTenantsCmd.Flags().Int("responsible-team-id", 0, "Filter tenants by responsible team ID")
 	getTenantsCmd.Flags().Int("sdm-id", 0, "Filter tenants by SDM ID")
+
+	updateListCommand(getTenantsCmd, "/tenants", func() map[string]string {
+		params := make(map[string]string)
+
+		name, _ := getTenantsCmd.Flags().GetString("name")
+		if name != "" {
+			params["name"] = name
+		}
+
+		responsibleTeamID, _ := getTenantsCmd.Flags().GetInt("responsible-team-id")
+		if responsibleTeamID != 0 {
+			params["responsibleTeamId"] = fmt.Sprintf("%d", responsibleTeamID)
+		}
+
+		sdmID, _ := getTenantsCmd.Flags().GetInt("sdm-id")
+		if sdmID != 0 {
+			params["sdmId"] = fmt.Sprintf("%d", sdmID)
+		}
+
+		return params
+	})
+
 	tenantsCmd.AddCommand(getTenantsCmd)
 
 	// Create tenant
@@ -192,37 +213,6 @@ func init() {
 	workflowEmailsCmd.AddCommand(editWorkflowEmailsCloseTicketCmd)
 }
 
-func getTenants(cmd *cobra.Command, args []string) error {
-	name, _ := cmd.Flags().GetString("name")
-	responsibleTeamID, _ := cmd.Flags().GetInt("responsible-team-id")
-	sdmID, _ := cmd.Flags().GetInt("sdm-id")
-
-	params := make(map[string]string)
-	if name != "" {
-		params["name"] = name
-	}
-	if responsibleTeamID != 0 {
-		params["responsibleTeamId"] = fmt.Sprintf("%d", responsibleTeamID)
-	}
-	if sdmID != 0 {
-		params["sdmId"] = fmt.Sprintf("%d", sdmID)
-	}
-
-	response, err := client.GetTenants(params)
-	if err != nil {
-		return err
-	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
-	if err != nil {
-		return err
-	}
-
-	// Affichage de la réponse formatée
-	fmt.Println(formattedOutput)
-	return nil
-}
-
 func createTenant(cmd *cobra.Command, args []string) error {
 	name, _ := cmd.Flags().GetString("name")
 	phone, _ := cmd.Flags().GetString("phone")
@@ -235,6 +225,7 @@ func createTenant(cmd *cobra.Command, args []string) error {
 	watchers, _ := cmd.Flags().GetStringSlice("watchers")
 	isEnabled, _ := cmd.Flags().GetBool("is-enabled")
 	cloudTempleID, _ := cmd.Flags().GetString("cloud-temple-id")
+	format, _ := cmd.Flags().GetString("format")
 
 	tenantData := map[string]interface{}{
 		"name":            name,
@@ -254,83 +245,78 @@ func createTenant(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func getTenantDetails(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetTenantDetails(args[0])
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func getTenantContacts(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetTenantContacts(args[0])
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func requestTenantDeletion(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	delete, _ := cmd.Flags().GetBool("delete")
 	response, err := client.RequestTenantDeletion(args[0], delete)
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func listTenantSSHKeys(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetTenantSSHKeys(args[0])
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func generateTenantSSHKey(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	comment, _ := cmd.Flags().GetString("comment")
 	isActive, _ := cmd.Flags().GetBool("is-active")
 
@@ -343,34 +329,32 @@ func generateTenantSSHKey(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func deleteTenantSSHKey(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.DeleteTenantSSHKey(args[0])
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func updateTenantSSHKey(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	isActive, _ := cmd.Flags().GetBool("is-active")
 
 	keyData := map[string]interface{}{
@@ -381,55 +365,33 @@ func updateTenantSSHKey(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func getTenantWorkflowEmails(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetTenantWorkflowEmails(args[0])
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func editTenantWorkflowEmailsGeneralities(cmd *cobra.Command, args []string) error {
-	format, _ := cmd.Flags().GetString("format")
-	from, _ := cmd.Flags().GetString("from")
-
-	data := map[string]interface{}{
-		"format": format,
-		"from":   from,
-	}
-
-	response, err := client.EditTenantWorkflowEmailsGeneralities(args[0], data)
-	if err != nil {
-		return err
-	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
-	if err != nil {
-		return err
-	}
-
-	// Affichage de la réponse formatée
-	fmt.Println(formattedOutput)
-	return nil
+	// Add necessary flags and implement the function
+	return fmt.Errorf("Not implemented")
 }
 
 func editTenantWorkflowEmailsCreateTicket(cmd *cobra.Command, args []string) error {

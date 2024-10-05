@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strconv"
 
@@ -22,7 +23,6 @@ func init() {
 	getTicketsCmd := &cobra.Command{
 		Use:   "list",
 		Short: "Get a list of Tickets",
-		RunE:  getTickets,
 	}
 	getTicketsCmd.Flags().String("name", "", "Filter tickets by subject (name)")
 	getTicketsCmd.Flags().IntSlice("status", nil, "Filter Tickets by one or more status (0-6)")
@@ -30,6 +30,44 @@ func init() {
 	getTicketsCmd.Flags().IntSlice("owner-ids", nil, "Filter tickets by one or more owner RTMS identifiers")
 	getTicketsCmd.Flags().Bool("is-not-assigned", false, "Filter non assigned tickets")
 	getTicketsCmd.Flags().Bool("is-on-delegation", false, "Filter tickets on delegation")
+
+	updateListCommand(getTicketsCmd, "/tickets", func() map[string]string {
+		params := make(map[string]string)
+		params["cloudTempleId"] = cloudTempleID
+
+		name, _ := getTicketsCmd.Flags().GetString("name")
+		if name != "" {
+			params["name"] = name
+		}
+
+		status, _ := getTicketsCmd.Flags().GetIntSlice("status")
+		if len(status) > 0 {
+			params["status[]"] = intSliceToString(status)
+		}
+
+		owner, _ := getTicketsCmd.Flags().GetString("owner")
+		if owner != "" {
+			params["owner"] = owner
+		}
+
+		ownerIDs, _ := getTicketsCmd.Flags().GetIntSlice("owner-ids")
+		if len(ownerIDs) > 0 {
+			params["ownerIds[]"] = intSliceToString(ownerIDs)
+		}
+
+		isNotAssigned, _ := getTicketsCmd.Flags().GetBool("is-not-assigned")
+		if isNotAssigned {
+			params["isNotAssigned"] = "true"
+		}
+
+		isOnDelegation, _ := getTicketsCmd.Flags().GetBool("is-on-delegation")
+		if isOnDelegation {
+			params["isOnDelegation"] = "true"
+		}
+
+		return params
+	})
+
 	ticketsCmd.AddCommand(getTicketsCmd)
 
 	// Create ticket
@@ -261,6 +299,7 @@ func init() {
 }
 
 func getTickets(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	name, _ := cmd.Flags().GetString("name")
 	status, _ := cmd.Flags().GetIntSlice("status")
 	owner, _ := cmd.Flags().GetString("owner")
@@ -269,6 +308,7 @@ func getTickets(cmd *cobra.Command, args []string) error {
 	isOnDelegation, _ := cmd.Flags().GetBool("is-on-delegation")
 
 	params := make(map[string]string)
+	params["cloudTempleId"] = cloudTempleID
 	if name != "" {
 		params["name"] = name
 	}
@@ -288,18 +328,44 @@ func getTickets(cmd *cobra.Command, args []string) error {
 		params["isOnDelegation"] = "true"
 	}
 
-	response, err := client.GetTickets(cloudTempleID, params)
-	if err != nil {
-		return err
-	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
-	if err != nil {
-		return err
+	dataChan, errChan := client.StreamData("/tickets", params, batchSize)
+
+	var tickets []interface{}
+	var processingError error
+
+	for {
+		select {
+		case item, ok := <-dataChan:
+			if !ok {
+				// Le canal de données est fermé, arrêtez le traitement
+				goto ProcessingComplete
+			}
+			tickets = append(tickets, item)
+		case err, ok := <-errChan:
+			if !ok {
+				// Le canal d'erreurs est fermé, continuez le traitement
+				continue
+			}
+			// Une erreur s'est produite, arrêtez le traitement
+			processingError = fmt.Errorf("erreur lors de la récupération des tickets : %w", err)
+			goto ProcessingComplete
+		}
 	}
 
-	// Affichage de la réponse formatée
-	fmt.Println(formattedOutput)
+ProcessingComplete:
+	if processingError != nil {
+		return processingError
+	}
+
+	// Formatage de la sortie
+	output, err := formatOutput(tickets, format)
+	if err != nil {
+		return fmt.Errorf("erreur lors du formatage de la sortie des tickets : %w", err)
+	}
+
+	// Affichage de la sortie
+	fmt.Fprintln(os.Stdout, output)
+
 	return nil
 }
 
@@ -308,6 +374,7 @@ func createTicket(cmd *cobra.Command, args []string) error {
 	description, _ := cmd.Flags().GetString("description")
 	owner, _ := cmd.Flags().GetInt("owner")
 	catalogItems, _ := cmd.Flags().GetIntSlice("catalog-items")
+	format, _ := cmd.Flags().GetString("format")
 
 	ticketData := map[string]interface{}{
 		"name":        name,
@@ -325,7 +392,7 @@ func createTicket(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -336,13 +403,14 @@ func createTicket(cmd *cobra.Command, args []string) error {
 }
 
 func getTicketsCount(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	status, _ := cmd.Flags().GetInt("status")
 	response, err := client.GetTicketsCount(cloudTempleID, status)
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -353,12 +421,13 @@ func getTicketsCount(cmd *cobra.Command, args []string) error {
 }
 
 func getTicketDetails(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetTicketDetails(args[0])
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -373,6 +442,7 @@ func editTicket(cmd *cobra.Command, args []string) error {
 	description, _ := cmd.Flags().GetString("description")
 	owner, _ := cmd.Flags().GetInt("owner")
 	catalogItems, _ := cmd.Flags().GetIntSlice("catalog-items")
+	format, _ := cmd.Flags().GetString("format")
 
 	ticketData := make(map[string]interface{})
 	if name != "" {
@@ -393,7 +463,7 @@ func editTicket(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -404,6 +474,7 @@ func editTicket(cmd *cobra.Command, args []string) error {
 }
 
 func getTicketCatalogs(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	selectedItem, _ := cmd.Flags().GetBool("selected-item")
 	availableItems, _ := cmd.Flags().GetBool("available-items")
 	isRoot, _ := cmd.Flags().GetBool("is-root")
@@ -424,7 +495,7 @@ func getTicketCatalogs(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -435,12 +506,13 @@ func getTicketCatalogs(cmd *cobra.Command, args []string) error {
 }
 
 func getTicketsStats(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetTicketsStats(cloudTempleID)
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -451,12 +523,13 @@ func getTicketsStats(cmd *cobra.Command, args []string) error {
 }
 
 func listTicketAttachments(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.ListTicketAttachments(args[0])
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -467,6 +540,7 @@ func listTicketAttachments(cmd *cobra.Command, args []string) error {
 }
 
 func uploadTicketAttachment(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	ticketID := args[0]
 	filePath := args[1]
 
@@ -481,7 +555,7 @@ func uploadTicketAttachment(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -510,12 +584,13 @@ func downloadTicketAttachment(cmd *cobra.Command, args []string) error {
 }
 
 func removeTicketAttachment(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.RemoveTicketAttachment(args[0])
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -526,6 +601,7 @@ func removeTicketAttachment(cmd *cobra.Command, args []string) error {
 }
 
 func listAllTicketComments(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	ticketID, _ := cmd.Flags().GetInt("ticket")
 	userID, _ := cmd.Flags().GetInt("user")
 
@@ -542,7 +618,7 @@ func listAllTicketComments(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -553,13 +629,14 @@ func listAllTicketComments(cmd *cobra.Command, args []string) error {
 }
 
 func listTicketComments(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	ticketID := args[0]
 	response, err := client.GetTicketCommentsByTicket(ticketID, nil)
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -570,6 +647,7 @@ func listTicketComments(cmd *cobra.Command, args []string) error {
 }
 
 func postTicketComment(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	ticketID := args[0]
 	content, _ := cmd.Flags().GetString("content")
 	private, _ := cmd.Flags().GetBool("private")
@@ -588,7 +666,7 @@ func postTicketComment(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -599,6 +677,7 @@ func postTicketComment(cmd *cobra.Command, args []string) error {
 }
 
 func editTicketComment(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	commentID := args[0]
 	content, _ := cmd.Flags().GetString("content")
 	private, _ := cmd.Flags().GetBool("private")
@@ -620,7 +699,7 @@ func editTicketComment(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -631,6 +710,7 @@ func editTicketComment(cmd *cobra.Command, args []string) error {
 }
 
 func listTicketTags(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	label, _ := cmd.Flags().GetString("label")
 	params := make(map[string]string)
 	if label != "" {
@@ -641,7 +721,7 @@ func listTicketTags(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -652,6 +732,7 @@ func listTicketTags(cmd *cobra.Command, args []string) error {
 }
 
 func createTicketTag(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	label, _ := cmd.Flags().GetString("label")
 	description, _ := cmd.Flags().GetString("description")
 	tickets, _ := cmd.Flags().GetIntSlice("tickets")
@@ -671,7 +752,7 @@ func createTicketTag(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -682,12 +763,13 @@ func createTicketTag(cmd *cobra.Command, args []string) error {
 }
 
 func getTicketTagDetails(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetTicketTagDetails(args[0])
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -698,12 +780,13 @@ func getTicketTagDetails(cmd *cobra.Command, args []string) error {
 }
 
 func removeTicketTag(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.RemoveTicketTag(args[0])
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -714,6 +797,7 @@ func removeTicketTag(cmd *cobra.Command, args []string) error {
 }
 
 func editTicketTag(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	label, _ := cmd.Flags().GetString("label")
 	description, _ := cmd.Flags().GetString("description")
 	tickets, _ := cmd.Flags().GetIntSlice("tickets")
@@ -734,7 +818,7 @@ func editTicketTag(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -745,12 +829,13 @@ func editTicketTag(cmd *cobra.Command, args []string) error {
 }
 
 func getTicketsByTag(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetTicketsByTag(args[0], nil)
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}

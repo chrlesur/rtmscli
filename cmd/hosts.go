@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 
 	"github.com/spf13/cobra"
@@ -20,11 +21,33 @@ func init() {
 	getHostsCmd := &cobra.Command{
 		Use:   "list",
 		Short: "Get a list of Hosts",
-		RunE:  getHosts,
 	}
 	getHostsCmd.Flags().String("name", "", "Filter hosts by name")
 	getHostsCmd.Flags().StringSlice("status", nil, "Filter by hosts status (UP, DOWN, PENDING, UNREACHABLE)")
 	getHostsCmd.Flags().Bool("is-monitored", false, "Filter by monitored hosts")
+
+	updateListCommand(getHostsCmd, "/hosts", func() map[string]string {
+		params := make(map[string]string)
+		params["cloudTempleId"] = cloudTempleID
+
+		name, _ := getHostsCmd.Flags().GetString("name")
+		if name != "" {
+			params["name"] = name
+		}
+
+		status, _ := getHostsCmd.Flags().GetStringSlice("status")
+		if len(status) > 0 {
+			params["status[]"] = fmt.Sprintf("[%s]", strconv.Quote(status[0]))
+		}
+
+		isMonitored, _ := getHostsCmd.Flags().GetBool("is-monitored")
+		if isMonitored {
+			params["isMonitored"] = "true"
+		}
+
+		return params
+	})
+
 	hostsCmd.AddCommand(getHostsCmd)
 
 	// Create host
@@ -122,11 +145,13 @@ func init() {
 }
 
 func getHosts(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	name, _ := cmd.Flags().GetString("name")
 	status, _ := cmd.Flags().GetStringSlice("status")
 	isMonitored, _ := cmd.Flags().GetBool("is-monitored")
 
 	params := make(map[string]string)
+	params["cloudTempleId"] = cloudTempleID
 	if name != "" {
 		params["name"] = name
 	}
@@ -137,24 +162,51 @@ func getHosts(cmd *cobra.Command, args []string) error {
 		params["isMonitored"] = "true"
 	}
 
-	response, err := client.GetHosts(cloudTempleID, params)
-	if err != nil {
-		return err
-	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
-	if err != nil {
-		return err
+	dataChan, errChan := client.StreamData("/hosts", params, batchSize)
+
+	var hosts []interface{}
+	var processingError error
+
+	for {
+		select {
+		case item, ok := <-dataChan:
+			if !ok {
+				// Le canal de données est fermé, arrêtez le traitement
+				goto ProcessingComplete
+			}
+			hosts = append(hosts, item)
+		case err, ok := <-errChan:
+			if !ok {
+				// Le canal d'erreurs est fermé, continuez le traitement
+				continue
+			}
+			// Une erreur s'est produite, arrêtez le traitement
+			processingError = fmt.Errorf("erreur lors de la récupération des hôtes : %w", err)
+			goto ProcessingComplete
+		}
 	}
 
-	// Affichage de la réponse formatée
-	fmt.Println(formattedOutput)
+ProcessingComplete:
+	if processingError != nil {
+		return processingError
+	}
+
+	// Formatage de la sortie
+	output, err := formatOutput(hosts, format)
+	if err != nil {
+		return fmt.Errorf("erreur lors du formatage de la sortie des hôtes : %w", err)
+	}
+
+	// Affichage de la sortie
+	fmt.Fprintln(os.Stdout, output)
+
 	return nil
 }
 
 func createHost(cmd *cobra.Command, args []string) error {
 	name, _ := cmd.Flags().GetString("name")
 	address, _ := cmd.Flags().GetString("address")
+	format, _ := cmd.Flags().GetString("format")
 
 	hostData := map[string]interface{}{
 		"name":    name,
@@ -166,7 +218,7 @@ func createHost(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -177,12 +229,13 @@ func createHost(cmd *cobra.Command, args []string) error {
 }
 
 func getHostDetails(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetHostDetails(args[0])
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -193,12 +246,13 @@ func getHostDetails(cmd *cobra.Command, args []string) error {
 }
 
 func removeHost(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.RemoveHost(args[0])
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -209,6 +263,7 @@ func removeHost(cmd *cobra.Command, args []string) error {
 }
 
 func updateHost(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	name, _ := cmd.Flags().GetString("name")
 	address, _ := cmd.Flags().GetString("address")
 
@@ -225,7 +280,7 @@ func updateHost(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -236,12 +291,13 @@ func updateHost(cmd *cobra.Command, args []string) error {
 }
 
 func getHostServices(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetHostServices(args[0], nil)
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -253,12 +309,13 @@ func getHostServices(cmd *cobra.Command, args []string) error {
 
 func updateHostTags(cmd *cobra.Command, args []string) error {
 	tags, _ := cmd.Flags().GetIntSlice("tags")
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.UpdateHostTags(args[0], tags)
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -269,6 +326,7 @@ func updateHostTags(cmd *cobra.Command, args []string) error {
 }
 
 func switchHostMonitoring(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	enable, _ := cmd.Flags().GetBool("enable")
 	services, _ := cmd.Flags().GetIntSlice("services")
 	response, err := client.SwitchHostMonitoring(args[0], enable, services)
@@ -276,7 +334,7 @@ func switchHostMonitoring(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -287,6 +345,7 @@ func switchHostMonitoring(cmd *cobra.Command, args []string) error {
 }
 
 func switchHostMonitoringNotifications(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	enable, _ := cmd.Flags().GetBool("enable")
 	services, _ := cmd.Flags().GetIntSlice("services")
 	response, err := client.SwitchHostMonitoringNotifications(args[0], enable, services)
@@ -294,7 +353,7 @@ func switchHostMonitoringNotifications(cmd *cobra.Command, args []string) error 
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
@@ -305,12 +364,13 @@ func switchHostMonitoringNotifications(cmd *cobra.Command, args []string) error 
 }
 
 func getHostsStats(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetHostsStats(cloudTempleID)
 	if err != nil {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}

@@ -30,6 +30,7 @@ func init() {
 }
 
 func listViewItems(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	viewType := args[0]
 	id := args[1]
 
@@ -53,7 +54,7 @@ func listViewItems(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}

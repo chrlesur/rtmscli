@@ -1,0 +1,23 @@
+# Fichiers générés par Go
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Fichiers de test
+*.test
+/tests/
+
+# Fichiers de couverture de code
+*.out
+
+# Dépendances
+/vendor/
+
+# Fichiers IDE
+.idea/
+.vscode/
+
+# Fichiers système
+.DS_Store
+Thumbs.db

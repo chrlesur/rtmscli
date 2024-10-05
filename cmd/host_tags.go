@@ -78,6 +78,7 @@ func init() {
 
 func getHostTags(cmd *cobra.Command, args []string) error {
 	label, _ := cmd.Flags().GetString("label")
+	format, _ := cmd.Flags().GetString("format")
 	params := make(map[string]string)
 	if label != "" {
 		params["label"] = label
@@ -87,13 +88,11 @@ func getHostTags(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
@@ -102,6 +101,7 @@ func createHostTag(cmd *cobra.Command, args []string) error {
 	label, _ := cmd.Flags().GetString("label")
 	description, _ := cmd.Flags().GetString("description")
 	hosts, _ := cmd.Flags().GetIntSlice("hosts")
+	format, _ := cmd.Flags().GetString("format")
 
 	tagData := map[string]interface{}{
 		"label": label,
@@ -117,45 +117,41 @@ func createHostTag(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func getHostTagDetails(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetHostTagDetails(args[0])
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func removeHostTag(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.RemoveHostTag(args[0])
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
@@ -164,6 +160,7 @@ func editHostTag(cmd *cobra.Command, args []string) error {
 	label, _ := cmd.Flags().GetString("label")
 	description, _ := cmd.Flags().GetString("description")
 	hosts, _ := cmd.Flags().GetIntSlice("hosts")
+	format, _ := cmd.Flags().GetString("format")
 
 	tagData := make(map[string]interface{})
 	if label != "" {
@@ -180,29 +177,26 @@ func editHostTag(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func getHostsByTag(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.GetHostsByTag(args[0], nil)
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }

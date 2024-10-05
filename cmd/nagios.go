@@ -56,6 +56,7 @@ func init() {
 
 func getNagiosCommands(cmd *cobra.Command, args []string) error {
 	name, _ := cmd.Flags().GetString("name")
+	format, _ := cmd.Flags().GetString("format")
 
 	params := make(map[string]string)
 	if name != "" {
@@ -66,13 +67,11 @@ func getNagiosCommands(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
@@ -80,6 +79,7 @@ func getNagiosCommands(cmd *cobra.Command, args []string) error {
 func getNagiosCommandsTimePeriods(cmd *cobra.Command, args []string) error {
 	name, _ := cmd.Flags().GetString("name")
 	alias, _ := cmd.Flags().GetString("alias")
+	format, _ := cmd.Flags().GetString("format")
 
 	params := make(map[string]string)
 	if name != "" {
@@ -93,19 +93,18 @@ func getNagiosCommandsTimePeriods(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func validateNagiosPluginPackage(cmd *cobra.Command, args []string) error {
 	packageJSON, _ := cmd.Flags().GetString("package")
+	format, _ := cmd.Flags().GetString("format")
 
 	var packageData map[string]interface{}
 	err := json.Unmarshal([]byte(packageJSON), &packageData)
@@ -117,29 +116,26 @@ func validateNagiosPluginPackage(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
 
 func updateNagiosCommands(cmd *cobra.Command, args []string) error {
+	format, _ := cmd.Flags().GetString("format")
 	response, err := client.UpdateNagiosCommands()
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
-	formattedOutput, err := formatOutput(response)
+	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
