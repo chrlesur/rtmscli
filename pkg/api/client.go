@@ -13,12 +13,13 @@ import (
 )
 
 type RTMSClient struct {
-	apiKey  string
-	baseURL string
-	client  *http.Client
+	apiKey       string
+	baseURL      string
+	client       *http.Client
+	isBase64Func func(string) bool
 }
 
-func NewRTMSClient(apiKey string, host string) (*RTMSClient, error) {
+func NewRTMSClient(apiKey string, host string, isBase64Func func(string) bool) (*RTMSClient, error) {
 	if apiKey == "" {
 		return nil, fmt.Errorf("API key cannot be empty")
 	}
@@ -37,9 +38,10 @@ func NewRTMSClient(apiKey string, host string) (*RTMSClient, error) {
 	}
 
 	return &RTMSClient{
-		apiKey:  apiKey,
-		baseURL: host,
-		client:  &http.Client{},
+		apiKey:       apiKey,
+		baseURL:      host,
+		client:       &http.Client{},
+		isBase64Func: isBase64Func,
 	}, nil
 }
 

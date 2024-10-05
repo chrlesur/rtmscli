@@ -45,7 +45,7 @@ Il fournit des commandes pour gérer les appliances, les hôtes, les tickets et 
 		}
 
 		var err error
-		client, err = api.NewRTMSClient(apiKey, host)
+		client, err = api.NewRTMSClient(apiKey, host, IsBase64)
 		if err != nil {
 			return fmt.Errorf("erreur lors de l'initialisation du client RTMS : %w", err)
 		}

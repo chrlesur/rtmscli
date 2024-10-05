@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -12,6 +13,17 @@ import (
 )
 
 func formatOutput(data interface{}, format string) (string, error) {
+	// Si data est de type []byte, essayons de le décoder en JSON
+	if byteData, ok := data.([]byte); ok {
+		var jsonData interface{}
+		err := json.Unmarshal(byteData, &jsonData)
+		if err == nil {
+			// Si le décodage réussit, utilisez les données décodées
+			data = jsonData
+		}
+		// Si le décodage échoue, on continue avec les données brutes
+	}
+
 	switch strings.ToLower(format) {
 	case "json":
 		return formatJSON(data)
@@ -128,4 +140,9 @@ func intSliceToString(slice []int) string {
 		strSlice[i] = strconv.Itoa(v)
 	}
 	return strings.Join(strSlice, ",")
+}
+
+func IsBase64(s string) bool {
+	_, err := base64.StdEncoding.DecodeString(s)
+	return err == nil
 }
