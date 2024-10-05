@@ -6,7 +6,7 @@
 
 # Fichiers de test
 *.test
-
+/tests/
 
 # Fichiers de couverture de code
 *.out

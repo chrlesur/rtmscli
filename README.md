@@ -144,3 +144,13 @@ Contributions to this project are welcome. Please follow these steps to contribu
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
+
+## Licence
+
+Ce projet est sous licence GNU General Public License v3.0.
+
+## Auteur
+
+Si vous avez des questions ou des suggestions, n'hésitez pas à ouvrir une issue sur GitHub ou à me contacter directement à [christophe.lesur@cloud-temple.com].
+
+[https://github.com/chrlesur/rtmscli](https://github.com/chrlesur/rtmscli)
