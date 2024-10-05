@@ -5,9 +5,10 @@ RTMS CLI is a command-line interface for interacting with the RTMS (Real-Time Mo
 
 ## Version
 
-- 20240914 - 1.0.0 Beta Release 
+- 20240914 - 1.0.0 Beta Release
 - 20240914 - 1.1.0 Beta Release - Enhanced catalogs and appliances management - Enhanced markdown output.
-
+- 20241005 - 1.2.0 Beta Release - Support for more than 100 returns in a call; add --limit option to manage number of return.
+- 
 ## Features
 
 - Appliance management
@@ -37,7 +38,7 @@ Before installing RTMS CLI, you need to have Go installed on your system. Here's
 #### macOS
 
 1. Use Homebrew (recommended):
-   ```
+   ```sh
    brew install go
    ```
    Or download the macOS installer from [the official Go website](https://golang.org/dl/).
@@ -47,22 +48,22 @@ Before installing RTMS CLI, you need to have Go installed on your system. Here's
 #### Linux
 
 1. Use your distribution's package manager:
-   
+
    For Ubuntu/Debian:
-   ```
+   ```sh
    sudo apt-get update
    sudo apt-get install golang
    ```
-   
+
    For Fedora:
-   ```
+   ```sh
    sudo dnf install golang
    ```
 
    Or download the tar.gz archive from [the official Go website](https://golang.org/dl/) and install it manually.
 
 2. Configure your `GOPATH` by adding these lines to your `.bashrc` or `.zshrc` file:
-   ```
+   ```sh
    export GOPATH=$HOME/go
    export PATH=$PATH:$GOPATH/bin
    ```
@@ -72,17 +73,17 @@ Before installing RTMS CLI, you need to have Go installed on your system. Here's
 Once Go is installed, you can install RTMS CLI by following these steps:
 
 1. Clone the repository:
-   ```
+   ```sh
    git clone https://github.com/chrlesur/rtmscli.git
    ```
 
 2. Navigate to the project directory:
-   ```
+   ```sh
    cd rtmscli
    ```
 
 3. Compile and install the CLI:
-   ```
+   ```sh
    go build
    ```
 
@@ -91,13 +92,13 @@ Once Go is installed, you can install RTMS CLI by following these steps:
 Before using RTMS CLI, you need to configure your RTMS API key. Set the `RTMS_API_KEY` environment variable:
 
 #### Windows
-```
+```sh
 setx RTMS_API_KEY "your_api_key_here"
 ```
 note : reload your shell after
 
 #### macOS and Linux
-```
+```sh
 echo 'export RTMS_API_KEY="your_api_key_here"' >> ~/.bashrc
 source ~/.bashrc
 ```
@@ -105,7 +106,7 @@ source ~/.bashrc
 
 The Cloud Temple ID (`-c` or `--cloud-temple-id`) is a required parameter for most commands. Make sure to include it in your commands, like this:
 
-```
+```sh
 rtmscli [command] -c cloud_temple_id [other options]
 ```
 
@@ -115,7 +116,7 @@ This ID is specific to your Cloud Temple environment and is necessary for the CL
 
 Here are some basic usage examples of RTMS CLI:
 
-```
+```sh
 # Display version
 rtmscli version
 
@@ -130,7 +131,7 @@ rtmscli -c cloud_temple_id -f html users list
 ```
 
 For more information on available commands, use:
-```
+```sh
 rtmscli --help
 ```
 
