@@ -67,13 +67,11 @@ func getNagiosCommands(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
 	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
@@ -95,13 +93,11 @@ func getNagiosCommandsTimePeriods(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
 	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
@@ -120,13 +116,11 @@ func validateNagiosPluginPackage(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
 	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }
@@ -137,13 +131,11 @@ func updateNagiosCommands(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// Utilisation de formatOutput pour formater la réponse
 	formattedOutput, err := formatOutput(response, format)
 	if err != nil {
 		return err
 	}
 
-	// Affichage de la réponse formatée
 	fmt.Println(formattedOutput)
 	return nil
 }

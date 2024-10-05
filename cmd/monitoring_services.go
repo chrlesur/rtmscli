@@ -16,7 +16,6 @@ var monitoringServicesCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(monitoringServicesCmd)
 
-	
 	// Get monitoring services
 	getMonitoringServicesCmd := &cobra.Command{
 		Use:   "list",
