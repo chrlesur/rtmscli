@@ -17,6 +17,7 @@ type RTMSClient struct {
 	baseURL      string
 	client       *http.Client
 	isBase64Func func(string) bool
+	debug        bool // New debug field
 }
 
 func NewRTMSClient(apiKey string, host string, isBase64Func func(string) bool) (*RTMSClient, error) {
@@ -27,12 +28,10 @@ func NewRTMSClient(apiKey string, host string, isBase64Func func(string) bool) (
 		return nil, fmt.Errorf("host cannot be empty")
 	}
 
-	// Ensure the host has a scheme
 	if !strings.HasPrefix(host, "http://") && !strings.HasPrefix(host, "https://") {
 		host = "https://" + host
 	}
 
-	// Ensure the host ends with "/v1"
 	if !strings.HasSuffix(host, "/v1") {
 		host = strings.TrimSuffix(host, "/") + "/v1"
 	}
@@ -43,6 +42,10 @@ func NewRTMSClient(apiKey string, host string, isBase64Func func(string) bool) (
 		client:       &http.Client{},
 		isBase64Func: isBase64Func,
 	}, nil
+}
+
+func (c *RTMSClient) SetDebug(debug bool) {
+	c.debug = debug
 }
 
 func (c *RTMSClient) doRequest(method, endpoint string, query url.Values, body interface{}) ([]byte, error) {
@@ -71,6 +74,13 @@ func (c *RTMSClient) doRequest(method, endpoint string, query url.Values, body i
 	req.Header.Set("X-AUTH-TOKEN", c.apiKey)
 	req.Header.Set("Content-Type", "application/json")
 
+	if c.debug {
+		fmt.Printf("Request: %s %s\n", method, u.String())
+		if reqBody != nil {
+			fmt.Printf("Request Body: %s\n", string(reqBody))
+		}
+	}
+
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error sending request: %w", err)
@@ -80,6 +90,11 @@ func (c *RTMSClient) doRequest(method, endpoint string, query url.Values, body i
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("error reading response body: %w", err)
+	}
+
+	if c.debug {
+		fmt.Printf("Response Status: %d\n", resp.StatusCode)
+		fmt.Printf("Response Body: %s\n", string(respBody))
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {

@@ -20,36 +20,36 @@ var (
 	limit         int
 	batchSize     int
 	filter        string
+	debug         bool // new debug flag
 )
 
 var rootCmd = &cobra.Command{
 	Use:   "rtmscli",
-	Short: "RTMS CLI est une interface en ligne de commande pour l'API RTMS",
-	Long: fmt.Sprintf(`RTMS CLI (version %s) vous permet d'interagir avec l'API RTMS depuis la ligne de commande.
-Il fournit des commandes pour gérer les appliances, les hôtes, les tickets et plus encore.`, Version),
+	Short: "RTMS CLI is a command line interface for the RTMS API",
+	Long: fmt.Sprintf(`RTMS CLI (version %s) allows you to interact with the RTMS API from the command line.
+It provides commands to manage appliances, hosts, tickets, and more.`, Version),
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		// Ignorer l'initialisation du client pour la commande version
 		if cmd.Use == "version" {
 			return nil
 		}
 
-		// Valider le format de sortie
 		validFormats := map[string]bool{"json": true, "text": true, "html": true, "markdown": true}
 		if !validFormats[outputFormat] {
-			return fmt.Errorf("format de sortie invalide : %s. Les formats supportés sont json, text, html, et markdown", outputFormat)
+			return fmt.Errorf("invalid output format: %s. Supported formats are json, text, html, and markdown", outputFormat)
 		}
 
-		// Initialisation du client
 		apiKey := os.Getenv("RTMS_API_KEY")
 		if apiKey == "" {
-			return fmt.Errorf("la variable d'environnement RTMS_API_KEY n'est pas définie")
+			return fmt.Errorf("environment variable RTMS_API_KEY is not set")
 		}
 
 		var err error
 		client, err = api.NewRTMSClient(apiKey, host, IsBase64)
 		if err != nil {
-			return fmt.Errorf("erreur lors de l'initialisation du client RTMS : %w", err)
+			return fmt.Errorf("error initializing RTMS client: %w", err)
 		}
+
+		client.SetDebug(debug) // Pass the debug flag to api client
 
 		return nil
 	},
@@ -60,21 +60,20 @@ func Execute() error {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&cloudTempleID, "cloud-temple-id", "c", "", "ID Cloud Temple (requis pour la plupart des commandes)")
-	rootCmd.PersistentFlags().StringVarP(&host, "host", "H", "rtms-api.cloud-temple.com", "Hôte de l'API RTMS")
-	rootCmd.PersistentFlags().StringVarP(&outputFormat, "format", "f", "json", "Format de sortie (json, text, html, markdown)")
+	rootCmd.PersistentFlags().StringVarP(&cloudTempleID, "cloud-temple-id", "c", "", "Cloud Temple ID (required for most commands)")
+	rootCmd.PersistentFlags().StringVarP(&host, "host", "H", "rtms-api.cloud-temple.com", "RTMS API host")
+	rootCmd.PersistentFlags().StringVarP(&outputFormat, "format", "f", "json", "Output format (json, text, html, markdown)")
+	rootCmd.PersistentFlags().IntVarP(&limit, "limit", "l", 0, "Limit the number of results returned (default: 0 for unlimited)")
+	rootCmd.PersistentFlags().IntVar(&batchSize, "batch-size", 100, "Number of items to fetch per batch")
+	rootCmd.PersistentFlags().StringVar(&filter, "filter", "", "Filter results (format depends on the command)")
+	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Enable debug mode")
 
-	rootCmd.PersistentFlags().IntVarP(&limit, "limit", "l", 0, "Limite le nombre de résultats retournés (par défaut : 0 pour illimité)")
-	rootCmd.PersistentFlags().IntVar(&batchSize, "batch-size", 100, "Nombre d'éléments à récupérer par lot")
-	rootCmd.PersistentFlags().StringVar(&filter, "filter", "", "Filtre les résultats (format dépendant de la commande)")
-
-	// Ajout de la commande version
 	rootCmd.AddCommand(versionCmd)
 }
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Affiche le numéro de version de RTMS CLI",
+	Short: "Displays the version number of RTMS CLI",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Printf("RTMS CLI version %s\n", Version)
 	},
