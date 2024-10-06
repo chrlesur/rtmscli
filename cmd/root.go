@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	Version = "1.2.0 beta release"
+	Version = "1.3.0 beta release"
 )
 
 var (
