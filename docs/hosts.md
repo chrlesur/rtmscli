@@ -1,179 +1,250 @@
-# Host Management
+# Hosts Module Documentation
 
-RTMS CLI provides a comprehensive set of commands for managing hosts. This document outlines the available commands and their usage.
+This documentation covers all the verbs (subcommands) available in the hosts module, including host tags management, as defined in the provided code. Each command's purpose, required arguments, and available options are detailed to provide a comprehensive guide for users of the rtmscli tool.
 
-## Available Commands
+## Base Command
 
-- `rtmscli hosts list`: List all hosts
-- `rtmscli hosts create`: Create a new host
-- `rtmscli hosts details`: Get details of a specific host
-- `rtmscli hosts remove`: Remove a host
-- `rtmscli hosts update`: Update a host
-- `rtmscli hosts services`: Get services of a specific host
-- `rtmscli hosts tags`: Manage host tags
-- `rtmscli hosts monitoring`: Manage host monitoring
-- `rtmscli hosts stats`: Get host status statistics
+```
+rtmscli hosts
+```
 
-## Usage Examples
+This is the base command for all host-related operations. It doesn't perform any action on its own but serves as a parent for the subcommands.
 
-### List Hosts
+## Subcommands
 
-To list all hosts:
+### 1. List Hosts
 
 ```
 rtmscli hosts list
 ```
 
+Retrieves a list of Hosts.
+
 Options:
-- `--name`: Filter hosts by name
-- `--status`: Filter hosts by status (UP, DOWN, PENDING, UNREACHABLE)
-- `--is-monitored`: Filter by monitored hosts
-- `--cloud-temple-id`: Specify the Cloud Temple ID (required)
+- `--cloud-temple-id`: (Required) The Cloud Temple ID to filter the hosts.
+- `--name`: (Optional) Filter hosts by name.
+- `--status`: (Optional) Filter by hosts status (UP, DOWN, PENDING, UNREACHABLE). Can be specified multiple times.
+- `--is-monitored`: (Optional) Filter by monitored hosts.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-Example:
-```
-rtmscli hosts list --cloud-temple-id=your_id --name=server1 --status=UP
-```
-
-### Create Host
-
-To create a new host:
+### 2. Create Host
 
 ```
-rtmscli hosts create --name=<name> --address=<address>
+rtmscli hosts create
 ```
 
-Example:
-```
-rtmscli hosts create --name=newserver --address=192.168.1.100
-```
+Creates a new Host.
 
-### Get Host Details
+Options:
+- `--cloud-temple-id`: (Required) The Cloud Temple ID for the new host.
+- `--name`: (Required) Host name.
+- `--address`: (Required) Host monitoring IP address.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-To get details of a specific host:
-
-```
-rtmscli hosts details [host-id]
-```
-
-Example:
-```
-rtmscli hosts details 12345
-```
-
-### Remove Host
-
-To remove a host:
+### 3. Get Host Details
 
 ```
-rtmscli hosts remove [host-id]
+rtmscli hosts details [id]
 ```
 
-Example:
-```
-rtmscli hosts remove 12345
-```
+Retrieves detailed information about a specific host.
 
-### Update Host
+Arguments:
+- `id`: (Required) The ID of the host.
 
-To update a host:
+Options:
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-```
-rtmscli hosts update [host-id] [flags]
-```
-
-Example:
-```
-rtmscli hosts update 12345 --name=updatedserver --address=192.168.1.101
-```
-
-### Get Host Services
-
-To get services of a specific host:
+### 4. Remove Host
 
 ```
-rtmscli hosts services [host-id]
+rtmscli hosts remove [id]
 ```
 
-Example:
-```
-rtmscli hosts services 12345
-```
+Removes a specific host.
 
-## Managing Host Tags
+Arguments:
+- `id`: (Required) The ID of the host to remove.
 
-### Update Host Tags
+Options:
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-To update tags for a host:
-
-```
-rtmscli hosts tags update [host-id] --tags=<tag1>,<tag2>
-```
-
-Example:
-```
-rtmscli hosts tags update 12345 --tags=production,webserver
-```
-
-## Host Monitoring
-
-### Enable/Disable Host Monitoring
-
-To enable or disable monitoring for a host:
+### 5. Update Host
 
 ```
-rtmscli hosts monitoring [host-id] --enable=<true|false>
+rtmscli hosts update [id]
 ```
 
-Example:
-```
-rtmscli hosts monitoring 12345 --enable=true
-```
+Updates information for a specific host.
 
-### Enable/Disable Host Monitoring Notifications
+Arguments:
+- `id`: (Required) The ID of the host to update.
 
-To enable or disable monitoring notifications for a host:
+Options:
+- `--name`: (Optional) New host name.
+- `--address`: (Optional) New host monitoring IP address.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 6. Get Host Services
 
 ```
-rtmscli hosts monitoring notifications [host-id] --enable=<true|false>
-```
-
-Example:
-```
-rtmscli hosts monitoring notifications 12345 --enable=true
+rtmscli hosts services [id]
 ```
 
-## Host Statistics
+Retrieves the services associated with a specific host.
 
-To get host status statistics:
+Arguments:
+- `id`: (Required) The ID of the host.
+
+Options:
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 7. Update Host Tags
+
+```
+rtmscli hosts update-tags [id]
+```
+
+Updates the tags associated with a specific host.
+
+Arguments:
+- `id`: (Required) The ID of the host.
+
+Options:
+- `--tags`: (Required) List of tag IDs to associate with the host.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 8. Switch Host Monitoring
+
+```
+rtmscli hosts switch-monitoring [id]
+```
+
+Enables or disables monitoring for all or specific host's services.
+
+Arguments:
+- `id`: (Required) The ID of the host.
+
+Options:
+- `--enable`: (Required) Enable or disable monitoring.
+- `--services`: (Optional) List of service IDs. If not provided, applies to all services.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 9. Switch Host Monitoring Notifications
+
+```
+rtmscli hosts switch-notifications [id]
+```
+
+Enables or disables monitoring notifications for all or specific host's services.
+
+Arguments:
+- `id`: (Required) The ID of the host.
+
+Options:
+- `--enable`: (Required) Enable or disable notifications.
+- `--services`: (Optional) List of service IDs. If not provided, applies to all services.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 10. Get Hosts Stats
 
 ```
 rtmscli hosts stats
 ```
 
-## Common Options
+Retrieves hosts status statistics.
 
-All host commands support the following options:
+Options:
+- `--cloud-temple-id`: (Required) The Cloud Temple ID to filter the stats.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-- `-f, --format`: Specify output format (json, html, markdown)
-- `-H, --host`: Specify the RTMS API host (default is "rtms-api.cloud-temple.com")
+## Host Tags Subcommands
 
-Example using format option:
-```
-rtmscli -f markdown hosts list --cloud-temple-id=your_id
-```
-
-For more detailed information on each command and its options, use the `--help` flag:
+### 11. List Host Tags
 
 ```
-rtmscli hosts --help
-rtmscli hosts [command] --help
+rtmscli hosts tags list
 ```
 
-## Best Practices
+Retrieves a list of host tags.
 
-1. Always use the `--cloud-temple-id` flag when required to ensure you're working with the correct tenant.
-2. Use tags to organize and categorize your hosts for easier management.
-3. Regularly review and update host monitoring settings to ensure optimal system oversight.
-4. Use the `hosts stats` command to get an overview of your host statuses and identify potential issues.
+Options:
+- `--cloud-temple-id`: (Required) The Cloud Temple ID to filter the tags.
+- `--label`: (Optional) Filter by label.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
+### 12. Create Host Tag
+
+```
+rtmscli hosts tags create
+```
+
+Creates a new host tag.
+
+Options:
+- `--cloud-temple-id`: (Required) The Cloud Temple ID for the new tag.
+- `--label`: (Required) Tag label.
+- `--description`: (Optional) Tag description.
+- `--hosts`: (Optional) List of host IDs to associate with the tag.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 13. Get Host Tag Details
+
+```
+rtmscli hosts tags details [id]
+```
+
+Retrieves details of a specific tag.
+
+Arguments:
+- `id`: (Required) The ID of the tag.
+
+Options:
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 14. Remove Host Tag
+
+```
+rtmscli hosts tags remove [id]
+```
+
+Removes a specific host tag.
+
+Arguments:
+- `id`: (Required) The ID of the tag to remove.
+
+Options:
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 15. Edit Host Tag
+
+```
+rtmscli hosts tags edit [id]
+```
+
+Edits an existing host tag.
+
+Arguments:
+- `id`: (Required) The ID of the tag to edit.
+
+Options:
+- `--label`: (Optional) New tag label.
+- `--description`: (Optional) New tag description.
+- `--hosts`: (Optional) New list of host IDs to associate with the tag.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 16. Get Hosts by Tag
+
+```
+rtmscli hosts tags hosts [id]
+```
+
+Retrieves hosts that match a given tag.
+
+Arguments:
+- `id`: (Required) The ID of the tag.
+
+Options:
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+Note: All commands support the global flags defined in the root command, such as `--debug` for enabling debug mode.

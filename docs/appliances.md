@@ -1,119 +1,116 @@
-# Appliances
+# Appliances Module Documentation
 
-The `appliances` command allows you to manage and interact with appliances in the RTMS system.
+The appliances module provides commands to manage and interact with appliances in the RTMS system.
 
-## Usage
+## Base Command
 
 ```
-rtmscli appliances [command]
+rtmscli appliances
 ```
 
-## Available Commands
+This is the base command for all appliance-related operations. It doesn't perform any action on its own but serves as a parent for the subcommands.
 
-### list
+## Subcommands
 
-Get a list of appliances.
+### 1. List Appliances
 
 ```
 rtmscli appliances list
 ```
 
-Flags:
-- `--cloud-temple-id string`: Cloud Temple Tenant identifier (required)
+Retrieves a list of appliances.
 
-### details
+Options:
+- `--cloud-temple-id`: (Required) The Cloud Temple ID to filter the appliances.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-Get Appliance details.
+### 2. Get Appliance Details
 
 ```
 rtmscli appliances details [id]
 ```
 
-### services
+Retrieves detailed information about a specific appliance.
 
-Get Appliance services.
+Arguments:
+- `id`: (Required) The ID of the appliance.
+
+Options:
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 3. Get Appliance Services
 
 ```
 rtmscli appliances services [id]
 ```
 
-### synchronize
+Retrieves the services associated with a specific appliance.
 
-Synchronize Appliance.
+Arguments:
+- `id`: (Required) The ID of the appliance.
+
+Options:
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 4. Synchronize Appliance
 
 ```
 rtmscli appliances synchronize [id]
 ```
 
-### configuration
+Initiates a synchronization process for a specific appliance.
 
-Get appliances configuration.
+Arguments:
+- `id`: (Required) The ID of the appliance to synchronize.
+
+Options:
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 5. Get Appliance Configuration
 
 ```
 rtmscli appliances configuration [id]
 ```
 
-Flags:
-- `--appliance-version string`: Appliance version (required)
-- `--plugins-path string`: Absolute path to the plugins installation directory on the appliance (required)
+Retrieves the configuration for a specific appliance.
 
-### healthcheck
+Arguments:
+- `id`: (Required) The ID of the appliance.
 
-Get a last heartbeat of an appliance.
+Options:
+- `--appliance-version`: (Required) The version of the appliance.
+- `--plugins-path`: (Required) The absolute path to the plugins installation directory on the appliance.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 6. Get Appliance Health Check
 
 ```
 rtmscli appliances healthcheck [id]
 ```
 
-### post-healthcheck
+Retrieves the last heartbeat (health check) of a specific appliance.
 
-Posts an appliance heartbeat.
+Arguments:
+- `id`: (Required) The ID of the appliance.
+
+Options:
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 7. Post Appliance Health Check
 
 ```
 rtmscli appliances post-healthcheck [id]
 ```
 
-Flags:
-- `--appliance-version string`: Appliance version (required)
-- `--nagios-operating-state string`: Nagios operating state (OK, WARNING, CRITICAL) (required)
-- `--details string`: Any details to explain the current operating state
+Posts a heartbeat (health check) for a specific appliance.
 
-## Examples
+Arguments:
+- `id`: (Required) The ID of the appliance.
 
-1. List all appliances:
-   ```
-   rtmscli appliances list --cloud-temple-id your-cloud-temple-id
-   ```
+Options:
+- `--appliance-version`: (Required) The version of the appliance.
+- `--nagios-operating-state`: (Required) The Nagios operating state (OK, WARNING, CRITICAL).
+- `--details`: (Optional) Any details to explain the current operating state.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-2. Get details of a specific appliance:
-   ```
-   rtmscli appliances details 12345
-   ```
-
-3. Get services of a specific appliance:
-   ```
-   rtmscli appliances services 12345
-   ```
-
-4. Synchronize a specific appliance:
-   ```
-   rtmscli appliances synchronize 12345
-   ```
-
-5. Get configuration of a specific appliance:
-   ```
-   rtmscli appliances configuration 12345 --appliance-version 1.0.0 --plugins-path /path/to/plugins
-   ```
-
-6. Get the last heartbeat of a specific appliance:
-   ```
-   rtmscli appliances healthcheck 12345
-   ```
-
-7. Post a heartbeat for a specific appliance:
-   ```
-   rtmscli appliances post-healthcheck 12345 --appliance-version 1.0.0 --nagios-operating-state OK --details "Everything is running smoothly"
-   ```
-
-For more information on a specific command, use `rtmscli appliances [command] --help`.
-```
+Note: All commands support the global flags defined in the root command, such as `--debug` for enabling debug mode.

@@ -1,135 +1,184 @@
-# User Management
+# Users Module Documentation
 
-The RTMS CLI provides several commands for managing users. This document outlines the available commands and their usage.
+The Users module provides commands to manage users in the RTMS system. The Users module allows administrators to manage user accounts within the RTMS system, including creating new users, updating existing user information, and retrieving user details. It also provides functionality to handle special user types like "not assigned" and "on delegation" users.
 
-## Available Commands
+This documentation covers all the verbs (subcommands) available in the Users module as defined in the provided code. Each command's purpose, required arguments, and available options are detailed to provide a comprehensive guide for users of the rtmscli tool.
 
-- `rtmscli users list`: Get a list of users
-- `rtmscli users create`: Create a new user
-- `rtmscli users details`: Get user details
-- `rtmscli users update`: Update a user
-- `rtmscli users whoami`: Get logged in user details
-- `rtmscli users not-assigned`: Get details of the not assigned user
-- `rtmscli users on-delegation`: Get details of the on delegation user
 
-## Usage Examples
+## Base Command
 
-### List Users
+```
+rtmscli users
+```
 
-To list all users:
+This is the base command for all user-related operations. It doesn't perform any action on its own but serves as a parent for the subcommands.
+
+## Subcommands
+
+### 1. List Users
 
 ```
 rtmscli users list
 ```
 
-Options:
-- `--name`: Filter users by name
-- `--enabled`: Filter by enabled users (true/false)
-- `--email`: Filter users by email address
-- `--is-contact`: Show only contact users for the tenant (true/false)
-- `--cloud-temple-id`: Specify the Cloud Temple ID (required)
-
-Example:
-```
-rtmscli users list --cloud-temple-id=your_id --name=John --enabled=true
-```
-
-### Create User
-
-To create a new user:
-
-```
-rtmscli users create --firstname=John --lastname=Doe --email=john.doe@example.com
-```
+Retrieves a list of users.
 
 Options:
-- `--firstname`: User's first name (required)
-- `--lastname`: User's last name (required)
-- `--email`: User's email (required)
-- `--enabled`: Is user enabled? (true/false, default is true)
-- `--mobile-phone`: User's mobile phone number
-- `--is-contact`: Is the user a contact person for its own tenant? (true/false)
-- `--cloud-temple-id`: Specify the Cloud Temple ID (required)
+- `--cloud-temple-id`: (Required) The Cloud Temple ID to filter the users.
+- `--name`: (Optional) Filter users by name.
+- `--enabled`: (Optional) Filter by enabled users. Default is true.
+- `--email`: (Optional) Filter users by email address.
+- `--is-contact`: (Optional) Show only contact users for the tenant. Default is false.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-Example:
-```
-rtmscli users create --cloud-temple-id=your_id --firstname=John --lastname=Doe --email=john.doe@example.com --mobile-phone="+1234567890" --is-contact=true
-```
-
-### Get User Details
-
-To get details of a specific user:
+### 2. Create User
 
 ```
-rtmscli users details [user-id]
+rtmscli users create
 ```
 
-Example:
-```
-rtmscli users details 12345
-```
-
-### Update User
-
-To update an existing user:
-
-```
-rtmscli users update [user-id] [flags]
-```
+Creates a new User.
 
 Options:
-- `--firstname`: User's new first name
-- `--lastname`: User's new last name
-- `--email`: User's new email
-- `--enabled`: Update user enabled status (true/false)
-- `--mobile-phone`: User's new mobile phone number
-- `--is-contact`: Update if the user is a contact person for its own tenant (true/false)
+- `--cloud-temple-id`: (Required) The Cloud Temple ID for the new user.
+- `--firstname`: (Required) User's firstname.
+- `--lastname`: (Required) User's lastname.
+- `--email`: (Required) User's email.
+- `--enabled`: (Optional) Is User enabled? Default is true.
+- `--mobile-phone`: (Optional) User's mobile phone number.
+- `--is-contact`: (Optional) Is the user a contact person for its own tenant? Default is false.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-Example:
+### 3. Get User Details
+
 ```
-rtmscli users update 12345 --firstname=John --email=new.email@example.com --enabled=false
+rtmscli users details [id]
 ```
 
-### Get Logged In User Details
+Retrieves detailed information about a specific user.
 
-To get details of the currently logged in user:
+Arguments:
+- `id`: (Required) The ID of the user.
+
+Options:
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 4. Update User
+
+```
+rtmscli users update [id]
+```
+
+Updates information for a specific user.
+
+Arguments:
+- `id`: (Required) The ID of the user to update.
+
+Options:
+- `--firstname`: (Optional) User's new firstname.
+- `--lastname`: (Optional) User's new lastname.
+- `--email`: (Optional) User's new email.
+- `--enabled`: (Optional) Is User enabled?
+- `--mobile-phone`: (Optional) User's new mobile phone number.
+- `--is-contact`: (Optional) Is the user a contact person for its own tenant?
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 5. Get Logged In User Details
 
 ```
 rtmscli users whoami
 ```
 
-### Get Not Assigned User Details
+Retrieves details of the currently logged in user.
 
-To get details of the not assigned user:
+Options:
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 6. Get Not Assigned User Details
 
 ```
 rtmscli users not-assigned
 ```
 
-### Get On Delegation User Details
+Retrieves details from the not assigned user.
 
-To get details of the on delegation user:
+Options:
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 7. Get On Delegation User Details
 
 ```
 rtmscli users on-delegation
 ```
 
-## Common Options
+Retrieves details from the on delegation user.
 
-All user commands support the following options:
+Options:
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-- `-f, --format`: Specify output format (json, html, markdown)
-- `-H, --host`: Specify the RTMS API host (default is "rtms-api.cloud-temple.com")
+Note: All commands support the global flags defined in the root command, such as `--debug` for enabling debug mode.
 
-Example using format option:
+## Detailed Command Descriptions
+
+### 1. List Users
+
+This command retrieves a list of users. You can filter the users by various criteria such as name, email, enabled status, and whether they are contact users.
+
+Usage example:
 ```
-rtmscli -f markdown users list --cloud-temple-id=your_id
+rtmscli users list --cloud-temple-id "your-id" --name "John" --email "john@example.com" --is-contact
 ```
 
-For more detailed information on each command and its options, use the `--help` flag:
+### 2. Create User
 
+This command creates a new user in the system. You need to provide essential information such as firstname, lastname, and email.
+
+Usage example:
 ```
-rtmscli users --help
-rtmscli users [command] --help
+rtmscli users create --cloud-temple-id "your-id" --firstname "John" --lastname "Doe" --email "john.doe@example.com" --mobile-phone "+1234567890" --is-contact
 ```
 
+### 3. Get User Details
+
+This command retrieves detailed information about a specific user based on their ID.
+
+Usage example:
+```
+rtmscli users details user-123
+```
+
+### 4. Update User
+
+This command allows you to update information for an existing user. You can modify various fields such as firstname, lastname, email, enabled status, mobile phone number, and contact status.
+
+Usage example:
+```
+rtmscli users update user-123 --firstname "Johnny" --email "johnny.doe@example.com" --enabled false
+```
+
+### 5. Get Logged In User Details
+
+This command retrieves details of the currently logged in user. It's useful for checking your own user information or permissions.
+
+Usage example:
+```
+rtmscli users whoami
+```
+
+### 6. Get Not Assigned User Details
+
+This command retrieves details of the "not assigned" user. This is typically a special user account used when no specific user is assigned to a task or item.
+
+Usage example:
+```
+rtmscli users not-assigned
+```
+
+### 7. Get On Delegation User Details
+
+This command retrieves details of the "on delegation" user. This is typically used when tasks or responsibilities are delegated to a temporary or substitute user.
+
+Usage example:
+```
+rtmscli users on-delegation
+```

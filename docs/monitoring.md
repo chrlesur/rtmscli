@@ -1,255 +1,287 @@
-# Monitoring in RTMS CLI
+# Monitoring Module Documentation
 
-RTMS CLI provides comprehensive monitoring capabilities, including system health checks, monitoring services management, and notification handling. This document outlines the available commands and their usage.
+The monitoring module provides commands to manage monitoring services, notifications, and performance data in the RTMS system.
+This documentation covers all the verbs (subcommands) available in the monitoring-related modules, including monitoring services, notifications, and performance, as defined in the provided code. Each command's purpose, required arguments, and available options are detailed to provide a comprehensive guide for users of the rtmscli tool.
 
-## Table of Contents
-1. [System Health](#system-health)
-2. [Monitoring Services](#monitoring-services)
-3. [Notifications](#notifications)
-
-## System Health
-
-RTMS CLI allows you to check the health of the RTMS services and the SLA Calculator.
-
-### Check RTMS Services Health
-
-To check the health of RTMS services:
+## Base Commands
 
 ```
-rtmscli monitoring health [flags]
+rtmscli monitoring-services
+rtmscli monitoring
 ```
+
+These are the base commands for monitoring-related operations. They don't perform any action on their own but serve as parents for the subcommands.
+
+## Monitoring Services Subcommands
+
+### 1. List Monitoring Services
+
+```
+rtmscli monitoring-services list
+```
+
+Retrieves a list of monitoring services.
 
 Options:
-- `--integration-services`: List of service identifiers to test the delay of integration of monitoring results
-- `--integration-delay`: Delay allowed in seconds to test the delay of integration of monitoring results
+- `--cloud-temple-id`: (Required) The Cloud Temple ID to filter the services.
+- `--name`: (Optional) Filter services by name.
+- `--status`: (Optional) Filter services by status. Can be specified multiple times.
+- `--impact`: (Optional) Filter services by impact. Can be specified multiple times.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-Example:
-```
-rtmscli monitoring health --integration-services=1,2,3 --integration-delay=60
-```
-
-### Check SLA Calculator Health
-
-To check the health of the SLA Calculator:
+### 2. Create Monitoring Service
 
 ```
-rtmscli monitoring sla-calculator [flags]
+rtmscli monitoring-services create
 ```
+
+Creates a new monitoring service.
 
 Options:
-- `--update-delay`: Delay allowed in seconds between the current time and the last update of a ticket's SLA
+- `--cloud-temple-id`: (Required) The Cloud Temple ID for the new service.
+- `--name`: (Required) Monitoring service name.
+- `--appliance`: (Required) Appliance ID.
+- `--host`: (Required) Host ID.
+- `--template`: (Required) Template ID.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-Example:
-```
-rtmscli monitoring sla-calculator --update-delay=3600
-```
-
-## Monitoring Services
-
-RTMS CLI provides commands to manage monitoring services, including listing, creating, updating, and removing services.
-
-### List Monitoring Services
-
-To list all monitoring services:
+### 3. Get Monitoring Service Details
 
 ```
-rtmscli monitoring-services list [flags]
+rtmscli monitoring-services details [id]
 ```
+
+Retrieves detailed information about a specific monitoring service.
+
+Arguments:
+- `id`: (Required) The ID of the monitoring service.
 
 Options:
-- `--name`: Filter services by name
-- `--status`: Filter services by status (OK, WARNING, CRITICAL, UNKNOWN, PENDING)
-- `--impact`: Filter services by impact (Availability, Performance, Information, Security)
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-Example:
-```
-rtmscli monitoring-services list --name=webserver --status=WARNING
-```
-
-### Create Monitoring Service
-
-To create a new monitoring service:
+### 4. Remove Monitoring Service
 
 ```
-rtmscli monitoring-services create [flags]
+rtmscli monitoring-services remove [id]
 ```
 
-Required flags:
-- `--name`: Monitoring service name
-- `--appliance`: Appliance ID
-- `--host`: Host ID
-- `--template`: Template ID
+Removes a specific monitoring service.
 
-Example:
-```
-rtmscli monitoring-services create --name=cpu_check --appliance=1 --host=2 --template=3
-```
-
-### Get Monitoring Service Details
-
-To get details of a specific monitoring service:
-
-```
-rtmscli monitoring-services details [service-id]
-```
-
-Example:
-```
-rtmscli monitoring-services details 12345
-```
-
-### Update Monitoring Service
-
-To update a monitoring service:
-
-```
-rtmscli monitoring-services update [service-id] [flags]
-```
-
-Example:
-```
-rtmscli monitoring-services update 12345 --name=new_cpu_check
-```
-
-### Remove Monitoring Service
-
-To remove a monitoring service:
-
-```
-rtmscli monitoring-services remove [service-id]
-```
-
-Example:
-```
-rtmscli monitoring-services remove 12345
-```
-
-### Get Monitoring Service Templates
-
-To get a list of monitoring service templates:
-
-```
-rtmscli monitoring-services templates [flags]
-```
+Arguments:
+- `id`: (Required) The ID of the monitoring service to remove.
 
 Options:
-- `--name`: Filter template by name
-- `--impact`: Filter templates by impact
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-Example:
-```
-rtmscli monitoring-services templates --name=cpu --impact=Performance
-```
-
-### Get Monitoring Services Statistics
-
-To get statistics about monitoring services:
+### 5. Update Monitoring Service
 
 ```
-rtmscli monitoring-services stats [flags]
+rtmscli monitoring-services update [id]
 ```
+
+Updates information for a specific monitoring service.
+
+Arguments:
+- `id`: (Required) The ID of the monitoring service to update.
 
 Options:
-- `--host-id`: Show stats of filtered monitoring services by host
-- `--appliance-id`: Show stats of filtered monitoring services by appliance
+- `--name`: (Optional) New monitoring service name.
+- `--appliance`: (Optional) New appliance ID.
+- `--host`: (Optional) New host ID.
+- `--template`: (Optional) New template ID.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-Example:
-```
-rtmscli monitoring-services stats --host-id=1234
-```
-
-## Notifications
-
-RTMS CLI provides commands to manage notifications related to monitoring services.
-
-### List Notifications
-
-To list all notifications:
+### 6. Get Monitoring Service Templates
 
 ```
-rtmscli monitoring-services notifications list [flags]
+rtmscli monitoring-services templates
 ```
+
+Retrieves a list of monitoring services templates.
 
 Options:
-- `--attach`: List only notifications attached to a ticket or not
-- `--staffs`: Filter by staff identifiers
-- `--perimeters`: Filter by perimeter identifiers
+- `--name`: (Optional) Filter template by name.
+- `--impact`: (Optional) Filter templates by impact. Can be specified multiple times.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-Example:
-```
-rtmscli monitoring-services notifications list --attach --staffs=1,2,3
-```
-
-### Create Notification
-
-To create a new notification:
+### 7. Get Monitoring Services Stats
 
 ```
-rtmscli monitoring-services notifications create [flags]
+rtmscli monitoring-services stats
 ```
 
-Required flags:
-- `--service-id`: Monitoring service ID
-- `--state`: State of monitoring service (OK, WARNING, CRITICAL, UNKNOWN)
-- `--content`: Content of the notification
-- `--subject`: Subject that will be sent by email/sms
+Retrieves monitoring services status and impact stats.
 
-Example:
-```
-rtmscli monitoring-services notifications create --service-id=1234 --state=WARNING --content="High CPU usage" --subject="CPU Warning"
-```
+Options:
+- `--cloud-temple-id`: (Required) The Cloud Temple ID to filter the stats.
+- `--host-id`: (Optional) Show stats of filtered monitoring services by host.
+- `--appliance-id`: (Optional) Show stats of filtered monitoring services by appliance.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-### Get Notification Details
+## Monitoring Service Notifications Subcommands
 
-To get details of a specific notification:
+### 1. List Service Notifications
 
 ```
-rtmscli monitoring-services notifications details [notification-id]
+rtmscli monitoring-services notifications list-service [service-id]
 ```
 
-Example:
-```
-rtmscli monitoring-services notifications details 5678
-```
+Retrieves a list of notifications for a specific service.
 
-### Attach Notification to Ticket
+Arguments:
+- `service-id`: (Required) The ID of the monitoring service.
 
-To attach a notification to a ticket:
+Options:
+- `--attach`: (Optional) List only notifications attached to a ticket or not. Default is false.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-```
-rtmscli monitoring-services notifications attach [notification-id] --ticket-id=[ticket-id]
-```
-
-Example:
-```
-rtmscli monitoring-services notifications attach 5678 --ticket-id=9012
-```
-
-### Detach Notification from Ticket
-
-To detach a notification from a ticket:
+### 2. List All Notifications
 
 ```
-rtmscli monitoring-services notifications detach [notification-id]
+rtmscli monitoring-services notifications list
 ```
 
-Example:
-```
-rtmscli monitoring-services notifications detach 5678
-```
+Retrieves a list of all notifications.
 
-## Common Options
+Options:
+- `--cloud-temple-id`: (Required) The Cloud Temple ID to filter the notifications.
+- `--attach`: (Optional) List only notifications attached to a ticket or not. Default is false.
+- `--staffs`: (Optional) Filter by staff identifiers. Can be specified multiple times.
+- `--perimeters`: (Optional) Filter by perimeter identifiers. Can be specified multiple times.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-All monitoring commands support the following options:
-
-- `-f, --format`: Specify output format (json, html, markdown)
-- `-H, --host`: Specify the RTMS API host (default is "rtms-api.cloud-temple.com")
-
-For more detailed information on each command and its options, use the `--help` flag:
+### 3. Create Notification
 
 ```
-rtmscli monitoring --help
-rtmscli monitoring-services --help
-rtmscli monitoring-services [command] --help
+rtmscli monitoring-services notifications create
 ```
 
+Creates a new notification.
+
+Options:
+- `--service-id`: (Required) Monitoring service ID.
+- `--state`: (Required) State of monitoring service (OK, WARNING, CRITICAL, UNKNOWN).
+- `--content`: (Required) Content of the notification.
+- `--subject`: (Required) Subject that will be sent by email/sms.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 4. Get Notification Details
+
+```
+rtmscli monitoring-services notifications details [id]
+```
+
+Retrieves notification details.
+
+Arguments:
+- `id`: (Required) The ID of the notification.
+
+Options:
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 5. Get Ticket Suggestions
+
+```
+rtmscli monitoring-services notifications suggest [id]
+```
+
+Retrieves ticket suggestions for a notification.
+
+Arguments:
+- `id`: (Required) The ID of the notification.
+
+Options:
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 6. Attach Notification to Ticket
+
+```
+rtmscli monitoring-services notifications attach [id]
+```
+
+Attaches a notification to a ticket.
+
+Arguments:
+- `id`: (Required) The ID of the notification.
+
+Options:
+- `--ticket-id`: (Required) Ticket ID to attach the notification to.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 7. Detach Notification from Ticket
+
+```
+rtmscli monitoring-services notifications detach [id]
+```
+
+Detaches a notification from a ticket.
+
+Arguments:
+- `id`: (Required) The ID of the notification.
+
+Options:
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+## Monitoring Service Performance Subcommands
+
+### 1. Get Metric History
+
+```
+rtmscli monitoring-services performance metric-history [service-id]
+```
+
+Retrieves a list of metrics versions for a given monitoring service.
+
+Arguments:
+- `service-id`: (Required) The ID of the monitoring service.
+
+Options:
+- `--start-date`: (Optional) Start date timestamp or milliseconds of searched period.
+- `--end-date`: (Optional) End date timestamp or milliseconds of searched period.
+- `--metric-name`: (Optional) List of metric names. Can be specified multiple times.
+- `--version-order`: (Optional) Version order: asc or desc.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 2. Get Graph Configurations
+
+```
+rtmscli monitoring-services performance graph-configurations [service-id]
+```
+
+Retrieves a list of graph configurations for a given monitoring service.
+
+Arguments:
+- `service-id`: (Required) The ID of the monitoring service.
+
+Options:
+- `--label`: (Optional) Filter graph by a string contained in label field.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+## General Monitoring Subcommands
+
+### 1. Check RTMS Health
+
+```
+rtmscli monitoring health
+```
+
+Checks if RTMS services are healthy.
+
+Options:
+- `--integration-services`: (Optional) List of service identifiers used to test the delay of integration of monitoring results. Can be specified multiple times.
+- `--integration-delay`: (Optional) Delay allowed in seconds to test the delay of integration of monitoring results.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 2. Check SLA Calculator Health
+
+```
+rtmscli monitoring sla-calculator
+```
+
+Checks if the SLA Calculator app is healthy.
+
+Options:
+- `--update-delay`: (Optional) Delay allowed in seconds between the current time and the last update of a ticket's SLA.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+Note: All commands support the global flags defined in the root command, such as `--debug` for enabling debug mode.

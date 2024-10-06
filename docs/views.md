@@ -1,107 +1,65 @@
-# View Management
+# Views Module Documentation
 
-The RTMS CLI provides a command for listing items in monitoring views. This document outlines the available command and its usage.
+The Views module provides commands to manage monitoring views in the RTMS system. The Views module allows users to interact with monitoring views in the RTMS system, providing a way to list and analyze the components (hosts, services, or templates) that make up these views. This functionality is crucial for understanding the structure of monitoring configurations and for managing large-scale monitoring setups.
 
-## Available Command
+This documentation covers the single verb (subcommand) available in the Views module as defined in the provided code. The command's purpose, required arguments, and available options are detailed to provide a comprehensive guide for users of the rtmscli tool.
 
-- `rtmscli views list`: List hosts, services, or templates in a monitoring view
 
-## View Types
+## Base Command
 
-RTMS supports three types of views:
+```
+rtmscli views
+```
 
-1. Host views
-2. Service views
-3. Template views
+This is the base command for all view-related operations. It doesn't perform any action on its own but serves as a parent for the subcommands.
 
-## Usage Examples
+## Subcommand
+
+### 1. List View Items
+
+```
+rtmscli views list [type] [id]
+```
+
+Lists hosts, services, or templates in a monitoring view.
+
+Arguments:
+- `type`: (Required) The type of items to list. Must be one of: 'host', 'service', or 'template'.
+- `id`: (Required) The ID of the view.
+
+Options:
+- `--order`: (Optional) Data sort order (ASC, DESC). Default is "DESC".
+- `--order-by`: (Optional) Attribute of the element on which to order. Default is "id".
+- `--page`: (Optional) Current page. Default is 1.
+- `--items-per-page`: (Optional) Number of items on a single page (max 500). Default is 100.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+Note: All commands support the global flags defined in the root command, such as `--debug` for enabling debug mode.
+
+## Detailed Command Description
 
 ### List View Items
 
-To list items in a monitoring view:
+This command retrieves a list of items (hosts, services, or templates) for a specific monitoring view. It allows you to specify the type of items you want to list and provides options for sorting and pagination.
 
+Usage example:
 ```
-rtmscli views list [type] [id] [flags]
-```
-
-Parameters:
-- `type`: The type of view (host, service, or template)
-- `id`: The identifier of the view
-
-Options:
-- `--order`: Data sort order (ASC or DESC, default is DESC)
-- `--order-by`: Attribute of the element on which to order (default is "id")
-- `--page`: Current page (default is 1)
-- `--items-per-page`: Number of items on a single page (default is 100, max 500)
-
-### List Host View Items
-
-To list items in a host view:
-
-```
-rtmscli views list host [view-id] [flags]
+rtmscli views list host view-123 --order ASC --order-by name --page 2 --items-per-page 50
 ```
 
-Example:
-```
-rtmscli views list host 12345 --order=ASC --order-by=name --page=2 --items-per-page=50
-```
+In this example:
+- We're listing host items for the view with ID "view-123".
+- The results will be sorted in ascending order by name.
+- We're requesting the second page of results.
+- Each page will contain 50 items.
 
-This command will list the hosts in the monitoring view with ID 12345, sorted by name in ascending order, displaying the second page with 50 items per page.
+The command will return an error if an invalid view type is provided (i.e., anything other than 'host', 'service', or 'template').
 
-### List Service View Items
+This command is useful for:
+1. Reviewing the contents of a monitoring view.
+2. Troubleshooting issues related to specific hosts, services, or templates within a view.
+3. Generating reports on the composition of monitoring views.
 
-To list items in a service view:
+The pagination options (`--page` and `--items-per-page`) are particularly useful when dealing with large views that may contain hundreds or thousands of items. By using these options, you can retrieve the data in manageable chunks.
 
-```
-rtmscli views list service [view-id] [flags]
-```
-
-Example:
-```
-rtmscli views list service 67890 --order=DESC --order-by=status
-```
-
-This command will list the services in the monitoring view with ID 67890, sorted by status in descending order.
-
-### List Template View Items
-
-To list items in a template view:
-
-```
-rtmscli views list template [view-id] [flags]
-```
-
-Example:
-```
-rtmscli views list template 54321 --items-per-page=200
-```
-
-This command will list the templates in the monitoring view with ID 54321, displaying 200 items per page.
-
-## Common Options
-
-The views command supports the following common options:
-
-- `-f, --format`: Specify output format (json, html, markdown)
-- `-H, --host`: Specify the RTMS API host (default is "rtms-api.cloud-temple.com")
-
-Example using format option:
-```
-rtmscli -f markdown views list host 12345
-```
-
-For more detailed information on the command and its options, use the `--help` flag:
-
-```
-rtmscli views --help
-rtmscli views list --help
-```
-
-## Notes
-
-- The view type must be one of "host", "service", or "template". An error will be returned if an invalid type is provided.
-- The view ID is required and must be a valid identifier for an existing view in the RTMS system.
-- Pagination is supported through the `--page` and `--items-per-page` options, allowing you to navigate through large result sets.
-- Sorting can be customized using the `--order` and `--order-by` options, allowing you to sort the results based on different attributes and in ascending or descending order.
-
+The sorting options (`--order` and `--order-by`) allow you to customize how the results are presented, which can be helpful when looking for specific items or when you need the data in a particular order for reporting or analysis purposes.

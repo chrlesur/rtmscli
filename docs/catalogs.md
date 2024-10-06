@@ -1,99 +1,70 @@
-# Catalogs
+# Catalogs Module Documentation
 
-The `catalogs` command allows you to manage and interact with ticket classification catalogs in the RTMS system.
+The catalogs module allows users to interact with various aspects of the ticket classification system, including listing catalogs, retrieving default catalogs, getting items for specific catalogs, and accessing root catalogs. These commands provide flexibility in managing and viewing the catalog structure within the RTMS system.
 
-## Usage
+## Base Command
 
 ```
-rtmscli catalogs [command]
+rtmscli catalogs
 ```
 
-## Available Commands
+This is the base command for all catalog-related operations. It doesn't perform any action on its own but serves as a parent for the subcommands.
 
-### list
+## Subcommands
 
-Get a list of Ticket classification catalogs and items.
+### 1. List Catalogs
 
 ```
 rtmscli catalogs list
 ```
 
-Flags:
-- `--cloud-temple-id string`: Cloud Temple Tenant identifier (required)
-- `--available-items`: Show classification catalog with their available items
-- `--is-root`: If true, only classification root catalogs will be displayed
+Retrieves a list of Ticket classification catalogs and items.
 
-### defaults
+Options:
+- `--cloud-temple-id`: (Required) The Cloud Temple ID to filter the catalogs.
+- `--available-items`: (Optional) Show classification catalog with their available items. Default is false.
+- `--is-root`: (Optional) If true, only classification root catalogs will be displayed. Default is false.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-Get a list of all default ticket classification catalogs and catalog items.
+### 2. Get Default Catalogs
 
 ```
 rtmscli catalogs defaults
 ```
 
-Flags:
-- `--available-items`: Show classification catalog with their available items
-- `--is-root`: If true, only classification root catalogs will be displayed
+Retrieves a list of all default ticket classification catalogs and catalog items.
 
-### items
+Options:
+- `--available-items`: (Optional) Show classification catalog with their available items. Default is false.
+- `--is-root`: (Optional) If true, only classification root catalogs will be displayed. Default is false.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-Get a list of items for a catalog.
+### 3. Get Catalog Items
 
 ```
 rtmscli catalogs items [catalog-id]
 ```
 
-Flags:
-- `--enabled`: Display only enabled or disabled catalog items
+Retrieves a list of items for a specific catalog.
 
-### root
+Arguments:
+- `catalog-id`: (Required) The ID of the catalog.
 
-Get the root required catalog.
+Options:
+- `--enabled`: (Optional) Display only enabled or disabled catalog items. Default is false.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
+
+### 4. Get Root Catalog
 
 ```
 rtmscli catalogs root
 ```
 
-Flags:
-- `--type string`: Required Catalog type (origin, perimeter, or nature) (required)
-- `--available-items`: Display associated catalog items
+Retrieves the root required catalog.
 
-## Examples
+Options:
+- `--type`: (Required) Required Catalog type (origin, perimeter, or nature).
+- `--available-items`: (Optional) Display associated catalog items. Default is false.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-1. List all catalogs:
-   ```
-   rtmscli catalogs list --cloud-temple-id your-cloud-temple-id
-   ```
-
-2. List all catalogs with available items:
-   ```
-   rtmscli catalogs list --cloud-temple-id your-cloud-temple-id --available-items
-   ```
-
-3. Get default catalogs:
-   ```
-   rtmscli catalogs defaults
-   ```
-
-4. Get items for a specific catalog:
-   ```
-   rtmscli catalogs items 12345
-   ```
-
-5. Get items for a specific catalog, showing only enabled items:
-   ```
-   rtmscli catalogs items 12345 --enabled
-   ```
-
-6. Get the root catalog of type "origin":
-   ```
-   rtmscli catalogs root --type origin
-   ```
-
-7. Get the root catalog of type "perimeter" with associated items:
-   ```
-   rtmscli catalogs root --type perimeter --available-items
-   ```
-
-For more information on a specific command, use `rtmscli catalogs [command] --help`.
-```
+Note: All commands support the global flags defined in the root command, such as `--debug` for enabling debug mode.

@@ -1,101 +1,103 @@
-# Nagios Management
+# Nagios Module Documentation
 
-RTMS CLI provides several commands for managing Nagios-related functionalities. This document outlines the available commands and their usage.
+The Nagios module allows users to interact with various aspects of Nagios integration within the RTMS system, including listing commands, managing time periods, validating plugins, and updating commands. These functionalities are crucial for maintaining and configuring the Nagios-based monitoring capabilities of the RTMS system.
 
-## Available Commands
+This documentation covers all the verbs (subcommands) available in the Nagios module as defined in the provided code. Each command's purpose, required arguments, and available options are detailed to provide a comprehensive guide for users of the rtmscli tool.
 
-- `rtmscli nagios commands`: Get a list of Nagios commands
-- `rtmscli nagios time-periods`: Get Nagios commands execution time periods list
-- `rtmscli nagios validate-plugin`: Validate a Nagios plugin package
-- `rtmscli nagios update-commands`: Update Nagios commands
+## Base Command
 
-## Usage Examples
+```
+rtmscli nagios
+```
 
-### List Nagios Commands
+This is the base command for all Nagios-related operations. It doesn't perform any action on its own but serves as a parent for the subcommands.
 
-To list all Nagios commands:
+## Subcommands
+
+### 1. Get Nagios Commands
 
 ```
 rtmscli nagios commands
 ```
 
+Retrieves a list of Nagios commands.
+
 Options:
-- `--name`: Filter commands by name
+- `--name`: (Optional) Filter commands by name.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-Example:
-```
-rtmscli nagios commands --name=check_http
-```
-
-### Get Nagios Time Periods
-
-To get the list of Nagios command execution time periods:
+### 2. Get Nagios Commands Time Periods
 
 ```
 rtmscli nagios time-periods
 ```
 
+Retrieves a list of Nagios commands execution time periods.
+
 Options:
-- `--name`: Filter time periods by name
-- `--alias`: Filter time periods by alias
-- `--cloud-temple-id`: Specify the Cloud Temple ID (optional)
+- `--name`: (Optional) Filter time periods by name.
+- `--alias`: (Optional) Filter time periods by alias.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-Example:
-```
-rtmscli nagios time-periods --name=24x7 --cloud-temple-id=your_id
-```
-
-### Validate Nagios Plugin Package
-
-To validate a Nagios plugin package:
+### 3. Validate Nagios Plugin Package
 
 ```
-rtmscli nagios validate-plugin --package='{"name": "example/plugin", ...}'
+rtmscli nagios validate-plugin
 ```
 
-The `--package` option should contain a valid JSON string representing the plugin's composer.json file.
+Validates a Nagios plugin package.
 
-Example:
-```
-rtmscli nagios validate-plugin --package='{"name": "external/nagios-plugins", "description": "Check CPU usage over SNMP", "version": "2.3.3", "type": "project", "require": {"cloud-temple/appliance": "^1.0"}, "bin": ["check_ping.sh"], "extra": {"commands": {"check_ping.sh": {"readme": "check_ping.md", "pluginArgs": "-H $HOSTADDRESS$ -w $ARG1$ -c $ARG2$ -p 5 -t 10"}}}}'
-```
+Options:
+- `--package`: (Required) JSON string of the Nagios Plugin package's composer.json.
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-### Update Nagios Commands
-
-To update Nagios commands:
+### 4. Update Nagios Commands
 
 ```
 rtmscli nagios update-commands
 ```
 
-This command doesn't require any additional parameters.
+Updates Nagios commands.
 
-## Common Options
+Options:
+- `--format`: (Optional) Output format (json, text, html, markdown). Default is json.
 
-All Nagios commands support the following options:
+Note: All commands support the global flags defined in the root command, such as `--debug` for enabling debug mode.
 
-- `-f, --format`: Specify output format (json, html, markdown)
-- `-H, --host`: Specify the RTMS API host (default is "rtms-api.cloud-temple.com")
+## Detailed Command Descriptions
 
-Example using format option:
+### 1. Get Nagios Commands
+
+This command retrieves a list of Nagios commands. You can optionally filter the commands by name.
+
+Usage example:
 ```
-rtmscli -f markdown nagios commands
-```
-
-## Nagios Plugin Package Validation
-
-The `validate-plugin` command checks the provided composer.json against the Cloud Temple schema for Nagios plugins. Here are some key points to remember when creating a plugin package:
-
-1. The `name` field should follow the format "vendor/package-name".
-2. The `type` field should be set to "project".
-3. The `require` section should include "cloud-temple/appliance": "^1.0".
-4. The `bin` section should list all executable scripts in the package.
-5. The `extra.commands` section should describe each command, including its readme file and plugin arguments.
-
-For more detailed information on each command and its options, use the `--help` flag:
-
-```
-rtmscli nagios --help
-rtmscli nagios [command] --help
+rtmscli nagios commands --name "check_http"
 ```
 
+### 2. Get Nagios Commands Time Periods
+
+This command retrieves a list of execution time periods for Nagios commands. You can filter the results by name or alias.
+
+Usage example:
+```
+rtmscli nagios time-periods --name "24x7" --alias "24 Hours A Day, 7 Days A Week"
+```
+
+### 3. Validate Nagios Plugin Package
+
+This command validates a Nagios plugin package by checking its composer.json file. The package data should be provided as a JSON string.
+
+Usage example:
+```
+rtmscli nagios validate-plugin --package '{"name": "example-plugin", "version": "1.0.0"}'
+```
+
+### 4. Update Nagios Commands
+
+This command triggers an update of the Nagios commands in the RTMS system. It doesn't require any additional parameters.
+
+Usage example:
+```
+rtmscli nagios update-commands
+```
